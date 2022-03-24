@@ -39,11 +39,14 @@ writeMessage('dragend');
 stage.add(layer);
 stage.add(topLayer);
 function addState(){
+let oldScale = stage.scaleX();
+  let centerX =  ((stage.width() / 2) - stage.x()) / oldScale;
+  let centerY =  ((stage.height() / 2)- stage.y()) / oldScale;
 
 
     let circle = new Konva.Circle({
-            x: stage.width() / 2,
-            y: stage.height() / 2,
+            x:centerX,
+            y: centerY,
             radius: 50,
             fill: 'white',
             stroke: 'black',
@@ -66,8 +69,8 @@ let state_text = new Konva.Text({
         align: 'center',
         listening : false,
         verticalAlign: 'middle',
-        x: stage.width() / 2-50,
-        y: stage.height() / 2-50,
+        x: circle.x() - 50,
+        y: circle.y() - 50,
     })
     circle.state_text = state_text;
     circle.on('dragmove', function () {
@@ -259,7 +262,7 @@ stage.position(newPos);
 });
 
 function  mousePointToStage(){
-    oldScale = stage.scaleX();
+    let oldScale = stage.scaleX();
     var pointer = stage.getPointerPosition();
     var mousePointTo = {
       x: (pointer.x - stage.x()) / oldScale,
