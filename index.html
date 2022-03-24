@@ -7,11 +7,13 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style type="text/css" media="screen">
     #editor {
-        position: absolute;
+        position: relative;
         top: 0;
         right: 0;
         bottom: 0;
         left: 0;
+        width : 100%;
+        height : 80vh;
     }
 </style>
 
@@ -22,15 +24,16 @@
 </head>
 <body>
 <div class = "row">
-    <div class="col" style="width = 50%">
-        <div id="editor">function foo(items) {
+
+    <div id = "konvaContainer" class="col" style="width:50%">
+
+        <div id="container" style="border-style: solid;"></div>
+    </div>
+     <div class="col bg-primary" style="width:50%">
+        <div id="editor"  style="width : 50vw;" >function foo(items) {
             var x = "All this is syntax highlighted";
             return x;
         }</div>
-    </div>
-    <div class="col">
-
-        <div id="container"></div>
     </div>
 
 </div>
@@ -41,11 +44,12 @@
       }
       var width = window.innerWidth;
       var height = window.innerHeight;
-
+      var sceneWidth = height;
+      var sceneHeight = width;
       var stage = new Konva.Stage({
         container: 'container',
-        width: width,
-        height: height,
+        width: width/2,
+        height: height/2,
       });
 
       var layer = new Konva.Layer();
@@ -84,6 +88,26 @@
 
       // add the layer to the stage
       stage.add(layer);
+
+      function fitStageIntoParentContainer() {
+        var container = document.querySelector('#konvaContainer');
+
+        // now we need to fit stage into parent container
+        var containerWidth = container.offsetWidth;
+
+        // but we also make the full scene visible
+        // so we need to scale all objects on canvas
+        var scale = containerWidth / sceneWidth;
+
+        stage.width(sceneWidth * scale);
+        stage.height(sceneHeight * scale);
+        stage.scale({ x: scale, y: scale });
+      }
+
+      //fitStageIntoParentContainer();
+      // adapt the stage on any window resize
+      //window.addEventListener('resize', fitStageIntoParentContainer);
+
     </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js" integrity="sha512-6ts6Fu561/yzWvD6uwQp3XVYwiWNpWnZ0hdeQrETqtnQiGjTfOS06W76aUDnq51hl1SxXtJaqy7IsZ3oP/uZEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
