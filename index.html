@@ -36,7 +36,7 @@
                         <a href="#" class="nav-link " data-bs-toggle="dropdown">File</a>
                         <div class="dropdown-menu">
                             <a href="#" class="dropdown-item">New</a>
-                            <a href="#" class="dropdown-item">Open</a>
+                            <a id = 'openFile' href="#" class="dropdown-item">Open</a>
                             <a href="#" class="dropdown-item">Open recent</a>
                             <div class="dropdown-divider"></div>
                             <a href="#"class="dropdown-item">Trash</a>
@@ -70,7 +70,7 @@
     </nav>
 
     <div class="my-2">
-        <button class="btn btn-primary">Add State</button>
+        <button class="btn btn-primary" onclick="addState()">Add State</button>
         <button class="btn btn-primary">Add Text</button>
         <button class="btn btn-primary" onclick="toggleCode()" >Toggle Code</button>
     </div>
@@ -108,5 +108,6 @@ function foo(items) {
 
 </script>
 <script src="konvaScript.js"></script>
+<script src="localFile.js"></script>
 </body>
 </html>
