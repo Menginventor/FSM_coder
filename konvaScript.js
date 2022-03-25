@@ -84,16 +84,19 @@ let state_text = new Konva.Text({
 }
 function fitStageIntoParentContainer() {
     var container = document.querySelector('#konvaContainer');
+    var editor = document.querySelector('#editor');
     var rowContainer = document.getElementById('rowContainer');
     var codeColumn = document.getElementById("codeCol");
-    console.log("fitStageIntoParentContainer");
-    console.log(codeColumn.classList.contains('d-none'));
+
     // now we need to fit stage into parent container
     var containerWidth = container.offsetWidth;
     var rowContainerWidth = rowContainer.offsetWidth;
 
     stage.width(rowContainerWidth - codeColumn.offsetWidth-30);
-    stage.height(container.offsetHeight-200);
+    stage.height(container.offsetHeight-100);
+    stage.height(container.offsetHeight-100);
+    editor.style.height = (rowContainer.offsetHeight-80)+'px';
+
     // but we also make the full scene visible
     // so we need to scale all objects on canvas
 
