@@ -1,6 +1,5 @@
-  function writeMessage(message) {
-text.text(message);
-}
+const selectToolEle = document.getElementById("selectTool");
+const connectToolEle = document.getElementById("connectTool");
 var width = window.innerWidth;
 var height = window.innerHeight;
 var sceneWidth = height;
@@ -10,7 +9,7 @@ container: 'container',
 width: width/2,
 height: height,
 });
-
+var arrowLayer = new Konva.Layer();
 var layer = new Konva.Layer();
 var topLayer = new Konva.Layer();
 var text = new Konva.Text({
@@ -36,6 +35,7 @@ writeMessage('dragend');
 
 
 // add the layer to the stage
+stage.add(arrowLayer);
 stage.add(layer);
 stage.add(topLayer);
 function addState(){
@@ -115,153 +115,218 @@ window.addEventListener('resize', fitStageIntoParentContainer);
 
 
 
-      var tr = new Konva.Transformer({
-        ignoreStroke: true,
-        rotateEnabled : false,
-        centeredScaling: true,
-      });
-      topLayer.add(tr);
+var tr = new Konva.Transformer({
+    ignoreStroke: true,
+    rotateEnabled : false,
+    centeredScaling: true,
+});
+topLayer.add(tr);
 
       // by default select all shapes
 
 
       // add a new feature, lets add ability to draw selection rectangle
 var selectionRectangle = new Konva.Rect({
-fill: 'rgba(0,0,255,0.5)',
-visible: false,
+    fill: 'rgba(0,0,255,0.5)',
+    visible: false,
 });
 topLayer.add(selectionRectangle);
 
 var x1, y1, x2, y2;
 stage.on('mousedown touchstart', (e) => {
-// do nothing if we mousedown on any shape
-if (e.target !== stage) {
-  return;
-}
-e.evt.preventDefault();
-let mousePos = mousePointToStage();
-x1 = mousePos.x;
-y1 = mousePos.y;
-x2 = mousePos.x;
-y2 = mousePos.y;
+    // do nothing if we mousedown on any shape
+    if(!selectToolEle.classList.contains('active')){
+        return;
+    }
+    if (e.target !== stage) {
+      return;
+    }
+    e.evt.preventDefault();
+    let mousePos = mousePointToStage();
+    x1 = mousePos.x;
+    y1 = mousePos.y;
+    x2 = mousePos.x;
+    y2 = mousePos.y;
 
-selectionRectangle.visible(true);
-selectionRectangle.width(0);
-selectionRectangle.height(0);
+    selectionRectangle.visible(true);
+    selectionRectangle.width(0);
+    selectionRectangle.height(0);
 });
 
 stage.on('mousemove touchmove', (e) => {
 // do nothing if we didn't start selection
-if (!selectionRectangle.visible()) {
-  return;
-}
-e.evt.preventDefault();
-let mousePos = mousePointToStage();
-
-x2 = mousePos.x;
-y2 = mousePos.y;
+    if(selectToolEle.classList.contains('active')){
 
 
-selectionRectangle.setAttrs({
-  x: Math.min(x1, x2),
-  y: Math.min(y1, y2),
-  width: Math.abs(x2 - x1),
-  height: Math.abs(y2 - y1),
-});
+        if (!selectionRectangle.visible()) {
+          return;
+        }
+        e.evt.preventDefault();
+        let mousePos = mousePointToStage();
+
+        x2 = mousePos.x;
+        y2 = mousePos.y;
+
+
+        selectionRectangle.setAttrs({
+          x: Math.min(x1, x2),
+          y: Math.min(y1, y2),
+          width: Math.abs(x2 - x1),
+          height: Math.abs(y2 - y1),
+        });
+    }
+    else  if(connectToolEle.classList.contains('active')){
+        if (srcConNode != null){
+            mpos = mousePointToStage();
+            let arrowPoints = newArrow.points();
+            arrowPoints[arrowPoints.length -2] = mpos.x;
+            arrowPoints[arrowPoints.length -1] = mpos.y;
+            newArrow.points(arrowPoints);
+
+
+
+        }
+
+    }
 });
 
 stage.on('mouseup touchend', (e) => {
-// do nothing if we didn't start selection
-if (!selectionRectangle.visible()) {
-  return;
-}
-e.evt.preventDefault();
-// update visibility in timeout, so we can check it in click event
-setTimeout(() => {
-  selectionRectangle.visible(false);
-});
+    // do nothing if we didn't start selection
+    if (!selectionRectangle.visible()) {
+      return;
+    }
+    e.evt.preventDefault();
+    // update visibility in timeout, so we can check it in click event
+    setTimeout(() => {
+      selectionRectangle.visible(false);
+    });
 
-var shapes = stage.find('.state');
-var box = selectionRectangle.getClientRect();
-var selected = shapes.filter((shape) =>
-  Konva.Util.haveIntersection(box, shape.getClientRect())
-);
-tr.nodes(selected);
+    var shapes = stage.find('.state');
+    var box = selectionRectangle.getClientRect();
+    var selected = shapes.filter((shape) =>
+      Konva.Util.haveIntersection(box, shape.getClientRect())
+    );
+    tr.nodes(selected);
 });
 
 // clicks should select/deselect shapes
 stage.on('click tap', function (e) {
-// if we are selecting with rect, do nothing
-if (selectionRectangle.visible()) {
-  return;
-}
+    // if we are selecting with rect, do nothing
+    let mpos = mousePointToStage();
+    console.log( e.target);
+    if(selectToolEle.classList.contains('active')){
+        if (selectionRectangle.visible()) {
+          return;
+        }
 
-// if click on empty area - remove all selections
-if (e.target === stage) {
-  tr.nodes([]);
-  return;
-}
+        // if click on empty area - remove all selections
+        if (e.target === stage) {
+          tr.nodes([]);
+          return;
+        }
 
-// do nothing if clicked NOT on our rectangles
-console.log(e.target);
-if (!e.target.hasName('state')) {
+        // do nothing if clicked NOT on our rectangles
+        //console.log(e.target);
+        if (!e.target.hasName('state')) {
+          return;
+        }
 
-  return;
-}
+        // do we pressed shift or ctrl?
+        const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
+        const isSelected = tr.nodes().indexOf(e.target) >= 0;
 
-// do we pressed shift or ctrl?
-const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
-const isSelected = tr.nodes().indexOf(e.target) >= 0;
+        if (!metaPressed && !isSelected) {
+          // if no key pressed and the node is not selected
+          // select just one
+          tr.nodes([e.target]);
 
-if (!metaPressed && !isSelected) {
-  // if no key pressed and the node is not selected
-  // select just one
-  tr.nodes([e.target]);
-} else if (metaPressed && isSelected) {
-  // if we pressed keys and node was selected
-  // we need to remove it from selection:
-  const nodes = tr.nodes().slice(); // use slice to have new copy of array
-  // remove node from array
-  nodes.splice(nodes.indexOf(e.target), 1);
-  tr.nodes(nodes);
-} else if (metaPressed && !isSelected) {
-  // add the node into selection
-  const nodes = tr.nodes().concat([e.target]);
-  tr.nodes(nodes);
-}
+        }
+        else if (metaPressed && isSelected) {
+          // if we pressed keys and node was selected
+          // we need to remove it from selection:
+          const nodes = tr.nodes().slice(); // use slice to have new copy of array
+          // remove node from array
+          nodes.splice(nodes.indexOf(e.target), 1);
+          tr.nodes(nodes);
+        } else if (metaPressed && !isSelected) {
+          // add the node into selection
+          const nodes = tr.nodes().concat([e.target]);
+          tr.nodes(nodes);
+        }
+    }
+    else if(connectToolEle.classList.contains('active')){
+        if (e.target.hasName('state')) {
+            e.target.stroke('blue')
+            e.target.strokeWidth(4);
+            if (srcConNode == null){
+                srcConNode = e.target;
+                console.log(srcConNode);
+                newArrow = new Konva.Arrow({
+
+                    points: [srcConNode.x(), srcConNode.y(),srcConNode.x(), srcConNode.y()],
+
+                    pointerLength: 20,
+                    pointerWidth: 16,
+                    fill: 'black',
+                    stroke: 'black',
+                    strokeWidth: 2,
+                    listening : false,
+                    tension : 0.5,
+                    strokeScaleEnabled: false,
+                });
+                arrowLayer.add(newArrow);
+            }
+
+        }
+        else if (e.target === stage) {
+        console.log('click on stage')
+          if (srcConNode != null){
+                 console.log("Add point to arrow");
+                mpos = mousePointToStage();
+                let arrowPoints = newArrow.points();
+                arrowPoints[arrowPoints.length -2] = mpos.x;
+                arrowPoints[arrowPoints.length -1] = mpos.y;
+                newArrow.points(arrowPoints.concat([mpos.x,mpos.y]));
+                console.log(arrowPoints);
+                console.log(arrowPoints.concat([mpos.x,mpos.y]));
+          }
+        }
+
+
+    }
 });
 /**/
 var scaleBy = 1.1;
 stage.on('wheel', (e) => {
-// stop default scrolling
-e.evt.preventDefault();
+    // stop default scrolling
+    e.evt.preventDefault();
 
-var oldScale = stage.scaleX();
-var pointer = stage.getPointerPosition();
+    var oldScale = stage.scaleX();
+    var pointer = stage.getPointerPosition();
 
-var mousePointTo = {
-  x: (pointer.x - stage.x()) / oldScale,
-  y: (pointer.y - stage.y()) / oldScale,
-};
+    var mousePointTo = {
+      x: (pointer.x - stage.x()) / oldScale,
+      y: (pointer.y - stage.y()) / oldScale,
+    };
 
-// how to scale? Zoom in? Or zoom out?
-let direction = e.evt.deltaY > 0 ? 1 : -1;
+    // how to scale? Zoom in? Or zoom out?
+    let direction = e.evt.deltaY > 0 ? 1 : -1;
 
-// when we zoom on trackpad, e.evt.ctrlKey is true
-// in that case lets revert direction
-if (e.evt.ctrlKey) {
-  direction = -direction;
-}
+    // when we zoom on trackpad, e.evt.ctrlKey is true
+    // in that case lets revert direction
+    if (e.evt.ctrlKey) {
+      direction = -direction;
+    }
 
-var newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+    var newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
 
-stage.scale({ x: newScale, y: newScale });
+    stage.scale({ x: newScale, y: newScale });
 
-var newPos = {
-  x: pointer.x - mousePointTo.x * newScale,
-  y: pointer.y - mousePointTo.y * newScale,
-};
-stage.position(newPos);
+    var newPos = {
+      x: pointer.x - mousePointTo.x * newScale,
+      y: pointer.y - mousePointTo.y * newScale,
+    };
+    stage.position(newPos);
 });
 
 function  mousePointToStage(){
@@ -272,4 +337,31 @@ function  mousePointToStage(){
       y: (pointer.y - stage.y()) / oldScale,
     };
     return mousePointTo;
+}
+var srcConNode = null;//source node for connecting
+var dstConNode = null;//destination node for connecting
+var newArrow = null;
+function connectToolClick(){
+    console.log('connectToolClick');
+    //reset src and dst node
+    srcConNode = null;//source node for connecting
+    dstConNode = null;
+    for (let idx = 0;idx<layer.children.length;idx++){
+        let node =layer.children[idx]
+        if (node.name() == 'state'){
+            node.draggable(false);
+        }
+    }
+}
+function selectToolClick(){
+    console.log('selectToolClick');
+
+    for (let idx = 0;idx<layer.children.length;idx++){
+        let node =layer.children[idx]
+        if (node.name() == 'state'){
+            node.draggable(true);
+            node.stroke('black')
+          node.strokeWidth(2);
+        }
+    }
 }

@@ -80,10 +80,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
         </div>
         <ul class="nav nav-pills my-2">
         <li class="nav-item">
-        <a class="nav-link active " data-bs-toggle="pill" aria-current="page" href="#"> <i class="fa-solid fa-arrow-pointer"></i> Select</a>
+        <a id="selectTool" class = "nav-link active" data-bs-toggle="pill"  onclick="selectToolClick()" href="#" > <i class="fa-solid fa-arrow-pointer"></i> Select</a>
         </li>
         <li class="nav-item">
-        <a class="nav-link" href="#" data-bs-toggle="pill"><i class="fa-solid fa-repeat"></i> Connect</a>
+        <a id="connectTool" class="nav-link" href="#" data-bs-toggle="pill" onclick="connectToolClick()"><i class="fa-solid fa-repeat"></i> Connect</a>
         </li>
 
         </ul>
@@ -119,6 +119,7 @@ function foo(items) {
         codeColumn.classList.toggle("d-none");
         fitStageIntoParentContainer();
     }
+
 
 </script>
 <script src="konvaScript.js"></script>
