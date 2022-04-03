@@ -69,7 +69,7 @@ let oldScale = stage.scaleX();
             name : 'state',
             strokeWidth: 2,
             draggable: true,
-            strokeScaleEnabled: false,
+            strokeScaleEnabled: true,
 
           });
 
@@ -150,7 +150,7 @@ let state_text = new Konva.Text({
         document.body.appendChild(textarea);
 
         textarea.value = circle.state_text.text();
-        textarea.innerText = circle.state_text.text() ;
+        textarea.innerHTML = '<div style = \"max-width : 100%\">' + circle.state_text.text() + '</div>' ;
         textarea.style.position = 'absolute';
         textarea.style.top = areaPosition.y+1.6 + 'px';
         textarea.style.left = areaPosition.x+3 + 'px';
@@ -161,24 +161,26 @@ let state_text = new Konva.Text({
         textarea.style.margin = '0px';
         textarea.style.overflow = 'hidden';
         textarea.style.background = 'none';
+         textarea.style.overflowWrap =  'break-word';
         textarea.style.lineHeight = circle.state_text.lineHeight();
         textarea.style.fontFamily = circle.state_text.fontFamily();
          textarea.style.fontSize = circle.state_text.fontSize()*stage.scaleX() + 'px';
 
          textarea.contentEditable = 'true';
          textarea.style.display = 'flex'
+           textarea.style.maxWidth = '100%',
           textarea.style.alignItems = 'center';
         textarea.style.justifyContent = 'center';
 
         textarea.focus();
          circle.state_text.hide();
-        textarea.addEventListener('keydown', function (e) {
+        //textarea.addEventListener('keydown', function (e) {
           // hide on enter
-          if (e.keyCode === 13) {
-          circle.state_text.text(textarea.innerText);
-            removeTextarea();
-          }
-        });
+          //if (e.keyCode === 13) {
+         //circle.state_text.text(textarea.innerText);
+           // removeTextarea();
+          //}
+        //});
         function removeTextarea() {
           textarea.parentNode.removeChild(textarea);
           window.removeEventListener('click', handleOutsideClick);
@@ -186,7 +188,8 @@ let state_text = new Konva.Text({
 
         }
          function handleOutsideClick(e) {
-          if (e.target !== textarea) {
+          if (e.target !== textarea.children[0] && e.target !== textarea) {
+
             circle.state_text.text(textarea.innerText);
            removeTextarea();
           }
@@ -196,6 +199,36 @@ let state_text = new Konva.Text({
         });
 });
 
+    circle.on('transform', function () {
+        circle.radius(circle.radius()*circle.scaleX());
+
+        state_text.width(2*circle.radius());
+         state_text.height(2*circle.radius());
+         state_text.x(circle.x() -circle.radius() )
+         state_text.y(circle.y() -circle.radius())
+
+        arrowLayer.children.forEach(function (arrow) {
+            if (arrow.srcState == circle){
+                destrosArrowPoints();
+                let arrowPoints = arrow.points();
+                arrowPoints[0] = circle.x();
+                arrowPoints[1] = circle.y();
+                arrow.points(arrowPoints);
+            }
+            // if-if fir recurrent transistion
+            if (arrow.dstState == circle){
+                destrosArrowPoints();
+                let arrowPoints = arrow.points();
+                let lastPointX = arrowPoints[arrowPoints.length -4];
+                let lastPointY = arrowPoints[arrowPoints.length -3];
+                let angleOfAttach = Math.atan2(lastPointY - circle.y(),lastPointX - circle.x());
+                let attachRadius = circle.radius() + circle.strokeWidth();
+                arrowPoints[arrowPoints.length -2] = circle.x() + attachRadius*Math.cos(angleOfAttach);
+                arrowPoints[arrowPoints.length -1] = circle.y() + attachRadius*Math.sin(angleOfAttach);
+                arrow.points(arrowPoints);
+            }
+        });
+    });
 
     layer.add(circle);
     layer.add(state_text);
@@ -476,21 +509,23 @@ function createNewArrow(){
         pointerWidth: 16,
         fill: 'black',
         stroke: 'black',
-        strokeWidth: 4,
+        strokeWidth: 2,
         listening : false,
         tension : 0.5,
-        strokeScaleEnabled: false,
+        strokeScaleEnabled: true,
         name : 'arrow',
     });
 
     arrow.on('mouseover', function () {
         this.fill('blue');
         this.stroke('blue');
+        this.strokeWidth(8);
     });
     arrow.on('mouseout', function () {
 
         this.fill('black');
         this.stroke('black');
+         this.strokeWidth(2);
 
     });
     arrow.on('dblclick dbltap', () => {
