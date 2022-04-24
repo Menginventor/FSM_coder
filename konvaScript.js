@@ -12,7 +12,7 @@ width: width/2,
 height: height,
 });
 var arrowLayer = new Konva.Layer();
-var layer = new Konva.Layer();
+var stateLayer = new Konva.Layer();
 var topLayer = new Konva.Layer();
 var arrowPointsNode = [];
 var text = new Konva.Text({
@@ -36,46 +36,55 @@ box.on('dragend', function () {
 writeMessage('dragend');
 });
 */
-function writeMessage(message) {
-    text.text(message);
-}
 
-// add the layer to the stage
-layer.add(text);
-stage.add(arrowLayer);
-stage.add(layer);
-stage.add(topLayer);
+
+
 
 function stateCount (){
     let count = 0;
-    for (let idx = 0; idx < layer.children.length; idx++){
-        if (layer.children[idx].name() == 'state')count++;
+    for (let idx = 0; idx < stateLayer.children.length; idx++){
+        if (stateLayer.children[idx].name() == 'state')count++;
 
     }
     return count;
 }
-function addState(){
-let oldScale = stage.scaleX();
+function addState(property){
+  console.log(property);
+  let oldScale = stage.scaleX();
   let centerX =  ((stage.width() / 2) - stage.x()) / oldScale;
   let centerY =  ((stage.height() / 2)- stage.y()) / oldScale;
 
+    let stateX = centerX+Math.random() * 20;
+    let stateY = centerY+Math.random() * 20;
+    let stateRadius = 50;
+    let stateFill = 'white';
+    let stateText = 'State' + (stateCount()+1);
+    if (property != null){
+        console.log('Create state with pre-define property');
+        stateX = property.x;
+        stateY = property.y;
+        stateRadius = property.radius;
+
+        stateText = property.text;
+        if (stateText == 'init')stateFill = 'lime';
+
+    }
 
     let circle = new Konva.Circle({
-            x:centerX+Math.random() * 20,
-            y: centerY+Math.random() * 20,
-            radius: 50,
-            fill: 'white',
+            x: stateX,
+            y: stateY,
+            radius: stateRadius,
+            fill: stateFill,
             stroke: 'black',
             name : 'state',
             strokeWidth: 2,
             draggable: true,
             strokeScaleEnabled: true,
-
           });
 
-let state_text = new Konva.Text({
- name : 'stateText',
-        text:'State' + (stateCount()+1),
+    let state_text = new Konva.Text({
+    name : 'stateText',
+        text:stateText,
         fontSize: 18,
         fontFamily: 'Calibri',
         fill: '#000',
@@ -115,11 +124,11 @@ let state_text = new Konva.Text({
         });
     });
     circle.on('mouseover', function () {
-        writeMessage('Mouseover ' + this.state_text.text());
+        //writeMessage('Mouseover ' + this.state_text.text());
         stateMouseOver = this;
       });
     circle.on('mouseout', function () {
-        writeMessage('Mouseout');
+        //writeMessage('Mouseout');
         stateMouseOver = null;
         if (srcConNode != circle){
             circle.stroke('black')
@@ -128,6 +137,9 @@ let state_text = new Konva.Text({
       });
 
    circle.on('dblclick dbltap', () => {
+        if (circle.state_text.text() == 'init'){
+            return;
+        }
         // create textarea over canvas with absolute position
 
         // first we need to find position for textarea
@@ -189,9 +201,9 @@ let state_text = new Konva.Text({
         }
          function handleOutsideClick(e) {
           if (e.target !== textarea.children[0] && e.target !== textarea) {
-
-            circle.state_text.text(textarea.innerText);
-           removeTextarea();
+            let new_name = textarea.innerText.trim();
+            if (new_name != 'init') circle.state_text.text(textarea.innerText);
+            removeTextarea();
           }
         }
         setTimeout(() => {
@@ -201,7 +213,8 @@ let state_text = new Konva.Text({
 
     circle.on('transform', function () {
         circle.radius(circle.radius()*circle.scaleX());
-
+        circle.scaleX(1);
+        circle.scaleY(1);
         state_text.width(2*circle.radius());
          state_text.height(2*circle.radius());
          state_text.x(circle.x() -circle.radius() )
@@ -230,8 +243,9 @@ let state_text = new Konva.Text({
         });
     });
 
-    layer.add(circle);
-    layer.add(state_text);
+    stateLayer.add(circle);
+    stateLayer.add(state_text);
+    return circle;
 
 }
 function fitStageIntoParentContainer() {
@@ -500,22 +514,38 @@ stage.on('click tap', function (e) {
     }
 });
 
-function createNewArrow(){
+function createNewArrow(property){
+    let arrowPoints = [];
+    let eventListening = false;
+    if (property != null){
+        console.log('Create arrow with pre-difined property');
+        console.log(property);
+        arrowPoints = property.points;
+        eventListening = true;
+
+    }
+    else{
+        arrowPoints = [srcConNode.x(), srcConNode.y(),srcConNode.x(), srcConNode.y()];
+    }
+
     let arrow = new Konva.Arrow({
 
-        points: [srcConNode.x(), srcConNode.y(),srcConNode.x(), srcConNode.y()],
+        points: arrowPoints,
 
         pointerLength: 20,
         pointerWidth: 16,
         fill: 'black',
         stroke: 'black',
         strokeWidth: 2,
-        listening : false,
+        listening : eventListening,
         tension : 0.5,
         strokeScaleEnabled: true,
         name : 'arrow',
     });
-
+    if (property != null){
+        arrow.srcState = stateLayer.children[property.srcStateIdx];
+        arrow.dstState = stateLayer.children[property.dstStateIdx];
+    }
     arrow.on('mouseover', function () {
         this.fill('blue');
         this.stroke('blue');
@@ -615,7 +645,7 @@ function showArrowPoints(arrow){
             if (point_type == 'start' || point_type == 'end'){
 
                  stateMouseOver = null;
-                 layer.children.slice().reverse().forEach(function (shape) {
+                 stateLayer.children.slice().reverse().forEach(function (shape) {
                         if (shape.hasName('state')){
                          let deltaX = circle.x() - shape.x();
                             let deltaY = circle.y() - shape.y();
@@ -749,8 +779,8 @@ function connectToolClick(){
     }
     srcConNode = null;//source node for connecting
     dstConNode = null;
-    for (let idx = 0;idx<layer.children.length;idx++){
-        let node = layer.children[idx]
+    for (let idx = 0;idx<stateLayer.children.length;idx++){
+        let node = stateLayer.children[idx]
         if (node.name() == 'state'){
             node.draggable(false);
         }
@@ -764,8 +794,8 @@ function selectToolClick(){
         newArrow.destroy();
     }
 
-    for (let idx = 0;idx<layer.children.length;idx++){
-        let node =layer.children[idx]
+    for (let idx = 0;idx<stateLayer.children.length;idx++){
+        let node =stateLayer.children[idx]
         if (node.name() == 'state'){
             node.draggable(true);
             node.stroke('black')
@@ -824,3 +854,16 @@ function p2segDist(A,  B,  E){
     }
     return ret;
 }
+
+
+
+
+stage.add(arrowLayer);
+stage.add(stateLayer);
+stage.add(topLayer);
+var initState = addState();
+initState.state_text.text('init');
+initState.fill('lime');
+initState.on('dblclick dbltap', () => {
+    console.log('init dbclick')
+});

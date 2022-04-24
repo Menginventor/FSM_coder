@@ -45,8 +45,9 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
                     <a href="#" class="dropdown-item">New</a>
                     <a id = 'openFile' href="#" class="dropdown-item">Open</a>
                     <a href="#" class="dropdown-item">Open recent</a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">Trash</a>
+                    <a id = 'saveFile', href="#" class="dropdown-item">Save</a>
+                    <a href="#" class="dropdown-item">Save as</a>
+
                 </div>
             </li>
             <li class="nav-item dropdown">
@@ -98,8 +99,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
         </div>
          <div class="col-auto h-100" id="codeCol" style="">
              <h3>Code</h3>
-             <div id="editor" class =""  style="width : 450px;height:100%">
-function foo(items) {
+             <div id="editor" class =""  style="width : 450px;height:100%">void foo(items) {
     var x = "All this is syntax highlighted";
     return x;
 }
@@ -126,6 +126,9 @@ function foo(items) {
 
 </script>
 <script src="konvaScript.js"></script>
+<script type="module">
+  import { get, set } from 'https://cdn.jsdelivr.net/npm/idb-keyval@6/+esm';
+</script>
 <script src="localFile.js"></script>
 </body>
 </html>
