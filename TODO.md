@@ -1,7 +1,11 @@
 - [x] drag and drop Konva shape
+- [x] Zoomable Konva stage
+- [ ] Stage pan tool
 - [x] Connect chape with arrow
 - [x] save and load canvas
 - [ ] delete shape and arrow with del key
 - [ ] add code to shape and initial code
 - [ ] generate .ino file
 - [ ] implement undo - redo
+- [ ] Debug mode (Show state transition in serail monitor)
+- [ ] Real-time debug (Connect web browser to Serial port)
