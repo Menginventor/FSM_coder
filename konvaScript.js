@@ -88,14 +88,14 @@ function addState(property){
         fontSize: 18,
         fontFamily: 'Calibri',
         fill: '#000',
-        width: 100,
-        height: 100,
+        width: stateRadius*2,
+        height: stateRadius*2,
         padding: 5,
         align: 'center',
         listening : false,
         verticalAlign: 'middle',
-        x: circle.x() - 50,
-        y: circle.y() - 50,
+        x: circle.x() - stateRadius,
+        y: circle.y() - stateRadius,
     })
     circle.state_text = state_text;
     circle.on('dragmove', function () {
