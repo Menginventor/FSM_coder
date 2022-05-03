@@ -49,7 +49,7 @@ function stateCount (){
     return count;
 }
 function addState(property){
-  console.log(property);
+
   let oldScale = stage.scaleX();
   let centerX =  ((stage.width() / 2) - stage.x()) / oldScale;
   let centerY =  ((stage.height() / 2)- stage.y()) / oldScale;
@@ -137,6 +137,8 @@ function addState(property){
       });
 
    circle.on('dblclick dbltap', () => {
+    tr.nodes([]);// Clear selection
+
         if (circle.state_text.text() == 'init'){
             return;
         }
@@ -348,7 +350,7 @@ stage.on('mousemove touchmove', (e) => {
           height: Math.abs(y2 - y1),
         });
     }
-    else  if(connectToolEle.classList.contains('active')){
+    else  if(connectToolEle.classList.contains('active')){//For connect tool
         if (srcConNode != null){
             mpos = mousePointToStage();
             let arrowPoints = newArrow.points();
@@ -407,7 +409,7 @@ stage.on('click tap', function (e) {
         console.log('click event');
         console.log(selectionRectangle.visible());
         if (selectionRectangle.visible()) {
-        console.log('return');
+            console.log('return');
           //return;
         }
 
@@ -770,6 +772,8 @@ var srcConNode = null;//source node for connecting
 var dstConNode = null;//destination node for connecting
 var newArrow = null;
 function connectToolClick(){
+    stage.container().style.cursor = 'default';
+    stage.draggable(false);
     console.log('connectToolClick');
     //reset src and dst node
     if (srcConNode != null){
@@ -787,6 +791,8 @@ function connectToolClick(){
     }
 }
 function selectToolClick(){
+    stage.container().style.cursor = 'default';
+    stage.draggable(false);
     console.log('selectToolClick');
     if (srcConNode != null){
         srcConNode.stroke('black')
@@ -803,7 +809,10 @@ function selectToolClick(){
         }
     }
 }
-
+function panToolClick(){
+    stage.draggable(true);
+    stage.container().style.cursor = 'move';
+}
 function p2segDist(A,  B,  E){
 
     //from https://www.geeksforgeeks.org/minimum-distance-from-a-point-to-the-line-segment-using-vectors/
@@ -861,6 +870,53 @@ function p2segDist(A,  B,  E){
 stage.add(arrowLayer);
 stage.add(stateLayer);
 stage.add(topLayer);
+var container = stage.container();
+
+// make it focusable
+
+container.tabIndex = 1;
+// focus it
+// also stage will be in focus on its click
+container.focus();
+container.addEventListener('keydown', function (event) {
+    const keyName = event.key;
+    console.log('Key pressed '+ keyName);
+    if (keyName == 'Backspace' || keyName == 'Delete'){
+        deleteShape();
+    }
+
+});
+
+function deleteShape(){
+        if (tr.node != null){
+            let eleList = tr.nodes()
+            for (let idx = 0;idx < eleList.length; idx++){
+                if (eleList[idx].state_text.text() != 'init'){
+
+                    //
+                    arrowLayer.children.forEach(function (arrow) {
+                        if (arrow.srcState == eleList[idx]){
+                           arrow.srcState = null;
+                        }
+                        // if-if fir recurrent transistion
+                        if (arrow.dstState == eleList[idx]){
+                            arrow.dstState = null;
+                        }
+                    });
+                    eleList[idx].state_text.destroy();
+                    eleList[idx].destroy();
+                }
+
+            }
+            tr.nodes([]);
+        }
+        if (selectedArrow != null){
+
+            destrosArrowPoints();
+            selectedArrow.destroy();
+            selectedArrow = null;
+        }
+}
 var initState = addState();
 initState.state_text.text('init');
 initState.fill('lime');

@@ -51,15 +51,22 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
                 </div>
             </li>
             <li class="nav-item dropdown">
-                <a href="#" class="nav-link " data-bs-toggle="dropdown">Recent</a>
-                <div class="dropdown-menu">
+                <a id = 'recentFile' href="#" class="nav-link " data-bs-toggle="dropdown">Recent</a>
+                <div id = 'recentFileDrop' class="dropdown-menu">
                     <a href="#" class="dropdown-item">(dummy)</a>
 
                     <div class="dropdown-divider"></div>
                     <a href="#" class="dropdown-item">Clear</a>
                 </div>
             </li>
+            <li class="nav-item dropdown">
+                <a href="#" class="nav-link " data-bs-toggle="dropdown">Tools</a>
+                <div class="dropdown-menu">
+                    <a href="#" class="dropdown-item">Generate .ino file</a>
 
+
+                </div>
+            </li>
             <li class="nav-item dropdown">
                 <a href="#" class="nav-link " data-bs-toggle="dropdown">View</a>
                 <div class="dropdown-menu">
@@ -80,6 +87,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
         <div class="my-2">
         <button class="btn btn-primary" onclick="addState()">Add State</button>
         <button class="btn btn-primary">Add Text</button>
+        <button class="btn btn-danger" onclick="deleteShape()"><i class="fa-solid fa-trash"></i> Delete</button>
+
         <button class="btn btn-primary" onclick="toggleCode()" >Toggle Code</button>
         </div>
         <ul class="nav nav-pills my-2">
@@ -87,7 +96,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
         <a id="selectTool" class = "nav-link active" data-bs-toggle="pill"  onclick="selectToolClick()" href="#" > <i class="fa-solid fa-arrow-pointer"></i> Select</a>
         </li>
         <li class="nav-item">
-        <a id="connectTool" class="nav-link" href="#" data-bs-toggle="pill" onclick="connectToolClick()"><i class="fa-solid fa-repeat"></i> Connect</a>
+            <a id="panTool" class = "nav-link " data-bs-toggle="pill"  onclick="panToolClick()" href="#" > <i class="fa-solid fa-arrows-up-down-left-right"></i> Pan</a>
+        </li>
+        <li class="nav-item">
+            <a id="connectTool" class="nav-link" href="#" data-bs-toggle="pill" onclick="connectToolClick()"><i class="fa-solid fa-repeat"></i> Connect</a>
         </li>
 
         </ul>

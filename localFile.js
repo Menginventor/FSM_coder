@@ -1,8 +1,67 @@
 
 var fileHandle;
-var request = window.indexedDB.open("recentFileDB");
+var DBOpenRequest = window.indexedDB.open("recentFileDB");
+window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
 
-btnOpenFile = document.getElementById('openFile');
+var db;
+ DBOpenRequest.onerror = function(event) {
+
+    alert('Error loading database.');
+  };
+
+DBOpenRequest.onsuccess = function(event) {
+    alert('Database initialised.');
+    // store the result of opening the database in the db variable. This is used a lot below
+    db = DBOpenRequest.result;
+    // Run the displayData() function to populate the task list with all the to-do list data already in the IDB
+
+};
+
+DBOpenRequest.onupgradeneeded = function(event) {
+    alert('DB upgraded!!')
+    let db = event.target.result;
+
+    db.onerror = function(event) {
+      note.appendChild(createListItem('Error loading database.'));
+    };
+
+    // Create an objectStore for this database
+
+    let objectStore = db.createObjectStore("recentFile", { keyPath: "fileName" });
+
+    // define what data items the objectStore will contain
+
+    objectStore.createIndex("time", "time", { unique: false });
+    objectStore.createIndex("fileHandle", "fileHandle", { unique: false });
+
+};
+
+const btnRecentFile = document.getElementById('recentFile');
+btnRecentFile.addEventListener('click', async () => {
+    console.log('Recent file clicked');
+    const dropdown = document.getElementById('recentFileDrop');
+    dropdown.innerHTML = '';
+    let objectStore = db.transaction('recentFile').objectStore('recentFile');
+    let html = '';
+    objectStore.openCursor().onsuccess = function(event) {
+        let cursor = event.target.result;
+        // if there is still another cursor to go, keep runing this code
+        if(cursor) {
+            console.log(cursor);
+            const fileHandle = cursor.value.fileHandle;
+            const fileName = cursor.value.fileName;
+            console.log(fileName)
+            dropdown.innerHTML += '<a href="#" class="dropdown-item">'+fileName+'</a>'
+            cursor.continue();
+
+        }
+        else{
+             dropdown.innerHTML += '<a onclick = "clearDB()" href="#" class="dropdown-item">Clear</a>';
+        }
+    }
+});
+
+const btnOpenFile = document.getElementById('openFile');
 btnOpenFile.addEventListener('click', async () => {
   // Destructure the one-element array.
   [fileHandle] = await window.showOpenFilePicker();
@@ -96,11 +155,30 @@ async function saveFileFunc(){
         let writeContent = JSON.stringify(data, null, 4);
         console.log(writeContent);
         writeFile(fileHandle,writeContent).then(() => console.log("File saved!!!"));
+        addRecentFilePath(fileHandle);
 
+        console.log(fileHandle.name);
       } catch (error) {
         console.error(error);
       }
 }
+async function verifyPermission(fileHandle, readWrite) {
+  const options = {};
+  if (readWrite) {
+    options.mode = 'readwrite';
+  }
+  // Check if permission was already granted. If so, return true.
+  if ((await fileHandle.queryPermission(options)) === 'granted') {
+    return true;
+  }
+  // Request permission. If the user grants permission, return true.
+  if ((await fileHandle.requestPermission(options)) === 'granted') {
+    return true;
+  }
+  // The user didn't grant permission, so return false.
+  return false;
+}
+
 async function getNewFileHandle() {
   const options = {
     types: [
@@ -143,6 +221,82 @@ document.addEventListener('keydown', (event) => {
 
 
   } else {
-    alert(`Key pressed ${keyName}`);
+    //alert(`Key pressed ${keyName}`);
   }
 }, false);
+
+
+
+
+
+
+
+// open a read/write db transaction, ready for adding the data
+
+// you would then go on to do something to this database
+// via an object store
+
+// etc.
+
+function addRecentFilePath(fileHandle){
+    let transaction = db.transaction("recentFile",'readwrite');
+
+    // report on the success of opening the transaction
+    transaction.oncomplete = event => {
+      alert('transaaction complete');
+    };
+
+    transaction.onerror = event => {
+      alert('transaction error');
+    };
+
+    let newItem = [
+        {fileName:fileHandle.name, time: Date.now(), fileHandle: fileHandle}
+      ];
+        let objectStore = transaction.objectStore("recentFile");
+     let objectStoreRequest = objectStore.add(newItem[0]);
+        objectStoreRequest.onsuccess = function(event) {
+        alert('objectStoreRequest onsuccess');
+    }
+}
+
+
+function displayData() {
+    // first clear the content of the task list so that you don't get a huge long list of duplicate stuff each time
+    //the display is updated.
+
+
+    // Open our object store and then get a cursor list of all the different data items in the IDB to iterate through
+    let objectStore = db.transaction('recentFile').objectStore('recentFile');
+    objectStore.openCursor().onsuccess = function(event) {
+      let cursor = event.target.result;
+        // if there is still another cursor to go, keep runing this code
+        if(cursor) {
+            console.log(cursor);
+            const fileHandle = cursor.value.fileHandle
+
+            console.log(fileHandle);
+
+
+            if( verifyPermission(fileHandle, false)) {
+            console.log('permission Granted, reading file: ')
+            readFile(fileHandle)
+            } else {
+            console.log('permission refused')
+            }
+            cursor.continue();
+        }
+    }
+}
+
+async function readFile(fileHandler) {
+  const file = await fileHandler.getFile();
+  const contents = await file.text();
+  console.log(contents)
+}
+
+function clearDB(){
+    console.log('Clear DB');
+    let objectStore = db.transaction('recentFile','readwrite').objectStore('recentFile');
+    objectStore.clear();
+}
