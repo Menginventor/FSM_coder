@@ -22,7 +22,7 @@ DBOpenRequest.onupgradeneeded = function(event) {
     let db = event.target.result;
 
     db.onerror = function(event) {
-      note.appendChild(createListItem('Error loading database.'));
+      alert('Error loading database.');
     };
 
     // Create an objectStore for this database
@@ -37,13 +37,14 @@ DBOpenRequest.onupgradeneeded = function(event) {
 };
 
 const btnRecentFile = document.getElementById('recentFile');
+
 btnRecentFile.addEventListener('click', async () => {
     console.log('Recent file clicked');
     const dropdown = document.getElementById('recentFileDrop');
     dropdown.innerHTML = '';
     let objectStore = db.transaction('recentFile').objectStore('recentFile');
     let html = '';
-    objectStore.openCursor().onsuccess = function(event) {
+    objectStore.index('time').openCursor(null, 'prev').onsuccess = function(event) {
         let cursor = event.target.result;
         // if there is still another cursor to go, keep runing this code
         if(cursor) {
@@ -51,7 +52,7 @@ btnRecentFile.addEventListener('click', async () => {
             const fileHandle = cursor.value.fileHandle;
             const fileName = cursor.value.fileName;
             console.log(fileName)
-            dropdown.innerHTML += '<a href="#" class="dropdown-item">'+fileName+'</a>'
+            dropdown.innerHTML += '<a onclick = \"openRecent(\''+fileName+'\')\" href="#" class=\"dropdown-item\">'+fileName+'</a>'
             cursor.continue();
 
         }
@@ -66,27 +67,38 @@ btnOpenFile.addEventListener('click', async () => {
   // Destructure the one-element array.
   [fileHandle] = await window.showOpenFilePicker();
   // Do something with the file handle.
-  const file = await fileHandle.getFile();
-   const contents = await file.text();
-   console.log(contents);
-   const obj = JSON.parse(contents);
-   console.log(obj);
-   stateLayer.destroyChildren();
-   arrowLayer.destroyChildren();
-   let stateNameArr = Object.keys(obj.state);
-
-   for (let idx = 0;idx < stateNameArr.length;idx++){
-        let stateName = stateNameArr[idx];
-        addState(obj.state[stateName])
-   }
-   let arrowNameArr = Object.keys(obj.arrow);
-    for (let idx = 0;idx < arrowNameArr.length;idx++){
-        let arrowName = arrowNameArr[idx];
-        createNewArrow(obj.arrow[arrowName])
-    }
-
+  openFileFunc(fileHandle)
 
 });
+async function openFileFunc(fileHandle){
+    let  permission = await verifyPermission(fileHandle, false);
+    console.log(permission);
+  if( permission) {
+                console.log('permission Granted, reading file: ')
+        const file = await fileHandle.getFile();
+        const contents = await file.text();
+        console.log(contents);
+        const obj = JSON.parse(contents);
+        console.log(obj);
+        stateLayer.destroyChildren();
+        arrowLayer.destroyChildren();
+        let stateNameArr = Object.keys(obj.state);
+
+        for (let idx = 0;idx < stateNameArr.length;idx++){
+            let stateName = stateNameArr[idx];
+            addState(obj.state[stateName])
+        }
+        let arrowNameArr = Object.keys(obj.arrow);
+        for (let idx = 0;idx < arrowNameArr.length;idx++){
+            let arrowName = arrowNameArr[idx];
+            createNewArrow(obj.arrow[arrowName])
+        }
+    }
+    else {
+                alert('permission refused')
+    }
+}
+
 btnSaveFile = document.getElementById('saveFile');
 
 btnSaveFile.addEventListener('click', async () => {
@@ -106,6 +118,7 @@ async function saveFileFunc(){
             },
           ],
         });
+
         const writeFile = async (fileHandle, contents) => {
             // Create a FileSystemWritableFileStream to write to.
             const writable = await fileHandle.createWritable();
@@ -156,8 +169,7 @@ async function saveFileFunc(){
         console.log(writeContent);
         writeFile(fileHandle,writeContent).then(() => console.log("File saved!!!"));
         addRecentFilePath(fileHandle);
-
-        console.log(fileHandle.name);
+        console.log(fileHandle);
       } catch (error) {
         console.error(error);
       }
@@ -254,7 +266,7 @@ function addRecentFilePath(fileHandle){
         {fileName:fileHandle.name, time: Date.now(), fileHandle: fileHandle}
       ];
         let objectStore = transaction.objectStore("recentFile");
-     let objectStoreRequest = objectStore.add(newItem[0]);
+     let objectStoreRequest = objectStore.put(newItem[0]);
         objectStoreRequest.onsuccess = function(event) {
         alert('objectStoreRequest onsuccess');
     }
@@ -277,22 +289,36 @@ function displayData() {
 
             console.log(fileHandle);
 
+            readFile(fileHandle);
 
-            if( verifyPermission(fileHandle, false)) {
-            console.log('permission Granted, reading file: ')
-            readFile(fileHandle)
-            } else {
-            console.log('permission refused')
-            }
             cursor.continue();
         }
     }
 }
 
+async function openRecent(fileName){
+    console.log('open recent '+ fileName);
+    let objectStore = db.transaction('recentFile','readwrite').objectStore('recentFile');
+    let objectStoreRequest  = objectStore.get(fileName);
+    objectStoreRequest.onsuccess = function(event) {
+        console.log(objectStoreRequest.result);
+        let fileHandle = objectStoreRequest.result.fileHandle;
+        openFileFunc(fileHandle)
+
+      };
+
+}
 async function readFile(fileHandler) {
-  const file = await fileHandler.getFile();
-  const contents = await file.text();
-  console.log(contents)
+    if( await verifyPermission(fileHandler, false)) {
+        console.log('permission Granted, reading file: ')
+        const file = await fileHandler.getFile();
+        const contents = await file.text();
+
+        console.log(contents)
+    } else {
+        console.log('permission refused')
+    }
+
 }
 
 function clearDB(){
