@@ -5,6 +5,7 @@
 - [x] save and load canvas to local file
 - [x] Create recent file
 - [x] delete shape and arrow with del key
+- [ ] Save, Save as, New
 - [ ] add code to shape and initial code
 - [ ] generate .ino file
 - [ ] implement undo - redo
