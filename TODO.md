@@ -1,3 +1,4 @@
+## Mojor
 - [x] drag and drop Konva shape
 - [x] Zoomable Konva stage
 - [x] Stage pan tool
@@ -8,6 +9,10 @@
 - [ ] Save, Save as, New
 - [ ] add code to shape and initial code
 - [ ] generate .ino file
+
+
+## Minor
+- [ ] Fit to screen
 - [ ] implement undo - redo
 - [ ] Debug mode (Show state transition in Serial monitor)
 - [ ] Real-time debug (Connect web browser to Serial port)
