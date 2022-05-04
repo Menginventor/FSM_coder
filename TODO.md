@@ -3,7 +3,7 @@
 - [x] Stage pan tool
 - [x] Connect shape with arrow
 - [x] save and load canvas to local file
-- [ ] Create recent file
+- [x] Create recent file
 - [x] delete shape and arrow with del key
 - [ ] add code to shape and initial code
 - [ ] generate .ino file
