@@ -9,7 +9,7 @@
 - [ ] Save, Save as, New
 - [ ] add code to shape and initial code
 - [ ] generate .ino file
-
+- [ ] Add text object (help visualization the FSM diagram)
 
 ## Minor
 - [ ] Fit to screen
