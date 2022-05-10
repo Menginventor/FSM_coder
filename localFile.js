@@ -94,6 +94,10 @@ async function openFileFunc(pickFileHandle){
             let arrowName = arrowNameArr[idx];
             createNewArrow(obj.arrow[arrowName])
         }
+          tr.nodes([]);
+          selectedArrow = null;
+           codeHeaderEle.innerText = 'Global scope';
+           editor.session.setValue(globalCode,-1);
 
         fileHandle = pickFileHandle;
     }
@@ -103,9 +107,12 @@ async function openFileFunc(pickFileHandle){
 }
 
 btnSaveFile = document.getElementById('saveFile');
-
+btnSaveAs = document.getElementById('saveAs');
 btnSaveFile.addEventListener('click', async () => {
    saveFileFunc();
+});
+btnSaveAs.addEventListener('click', async () => {
+   saveAsFunc();
 });
 
 async function saveFileFunc(){
@@ -185,6 +192,86 @@ async function saveFileFunc(){
         console.error(error);
       }
 }
+
+async function saveAsFunc(){
+    console.log('saveFile');
+
+    try {
+
+            console.log('Save new file');
+            let pickFileHandle = await self.showSaveFilePicker({
+                suggestedName: 'Untitled-FSM',
+                types: [
+                    {
+                        description: "Text file",
+                        accept: {'text/plain': ['.txt']},
+                        // ...
+                    },
+                ],
+            });
+
+
+
+        const writeFile = async (pickFileHandle, contents) => {
+            // Create a FileSystemWritableFileStream to write to.
+            const writable = await pickFileHandle.createWritable();
+            // Write the contents of the file to the stream.
+            await writable.write(contents);
+            // Close the file and write the contents to disk.
+            await writable.close();
+        };
+        // write file
+
+        let data = {};
+        data.state = {};
+        data.arrow = {};
+        data.globalCode = globalCode;
+        for (let idx = 0; idx < stateLayer.children.length; idx++){
+            let child = stateLayer.children[idx]
+            if (child.name() == 'state'){
+
+                console.log(child.state_text.text())
+                console.log(child.x());
+                console.log(child.y());
+                console.log(child.radius());
+                let stateName = child.state_text.text();
+                data.state[stateName] = {};
+                data.state[stateName].text = stateName;
+                data.state[stateName].x = child.x();
+                data.state[stateName].y = child.y();
+                data.state[stateName].radius = child.radius();
+                data.state[stateName].code = child.code;
+
+            }
+
+        }
+        for (let idx = 0; idx < arrowLayer.children.length; idx++){
+            let child = arrowLayer.children[idx]
+            console.log(child);
+            console.log(child.srcState);
+            console.log(child.srcState.state_text);
+            console.log(child.srcState.state_text.text());
+            let srcStateIdx = child.srcState.index;
+            let dstStateIdx = child.dstState.index;
+            let points = child.points();
+            data.arrow[idx] = {};
+            data.arrow[idx].srcStateIdx = srcStateIdx;
+            data.arrow[idx].dstStateIdx = dstStateIdx;
+            data.arrow[idx].points = points;
+            data.arrow[idx].code = child.code;
+        }
+        console.log(data)
+        let writeContent = JSON.stringify(data, null, 4);
+        console.log(writeContent);
+        writeFile(pickFileHandle,writeContent).then(() => console.log("File saved!!!"));
+        addRecentFilePath(pickFileHandle);
+        console.log(pickFileHandle);
+        fileHandle = pickFileHandle
+      } catch (error) {
+        console.error(error);
+      }
+}
+
 async function verifyPermission(fileHandle, readWrite) {
   const options = {};
   if (readWrite) {
