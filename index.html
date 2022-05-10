@@ -34,6 +34,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
         <nav class="navbar navbar-expand navbar-light bg-light">
         <div class="container-fluid">
         <a href="#" class="navbar-brand">FSM Coder</a>
+
         <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
         <span class="navbar-toggler-icon"></span>
         </button>
@@ -44,8 +45,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
                 <div class="dropdown-menu">
                     <a href="#" class="dropdown-item">New</a>
                     <a id = 'openFile' href="#" class="dropdown-item">Open</a>
-                    <a href="#" class="dropdown-item">Open recent</a>
-                    <a id = 'saveFile', href="#" class="dropdown-item">Save</a>
+                    <a id = 'saveFile' href="#" class="dropdown-item">Save</a>
                     <a href="#" class="dropdown-item">Save as</a>
 
                 </div>
@@ -83,8 +83,9 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
         </div>
         </div>
         </nav>
-
+  <h3 id = 'fileName'>Untitled</h3>
         <div class="my-2">
+
         <button class="btn btn-primary" onclick="addState()">Add State</button>
         <button class="btn btn-primary">Add Text</button>
         <button class="btn btn-danger" onclick="deleteShape()"><i class="fa-solid fa-trash"></i> Delete</button>
@@ -110,12 +111,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
             <div id="container" style="border-style: solid;height:95%"></div>
         </div>
          <div class="col-auto h-100" id="codeCol" style="">
-             <h3>Code</h3>
-             <div id="editor" class =""  style="width : 450px;height:100%">void foo(items) {
-    var x = "All this is syntax highlighted";
-    return x;
-}
-                </div>
+             <h3 id = 'codeHeader'>Global scope</h3>
+             <div id="editor" class =""  style="width : 450px;height:100%"></div>
         </div>
 
     </div>
@@ -142,5 +139,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
   import { get, set } from 'https://cdn.jsdelivr.net/npm/idb-keyval@6/+esm';
 </script>
 <script src="localFile.js"></script>
+<script src="fsm_coder.js"></script>
 </body>
 </html>

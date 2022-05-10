@@ -1,4 +1,5 @@
 
+
 var fileHandle;
 var DBOpenRequest = window.indexedDB.open("recentFileDB");
 window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
@@ -10,7 +11,7 @@ var db;
   };
 
 DBOpenRequest.onsuccess = function(event) {
-    alert('Database initialised.');
+    console.log('Database initialised.');
     // store the result of opening the database in the db variable. This is used a lot below
     db = DBOpenRequest.result;
     // Run the displayData() function to populate the task list with all the to-do list data already in the IDB
@@ -65,17 +66,17 @@ btnRecentFile.addEventListener('click', async () => {
 const btnOpenFile = document.getElementById('openFile');
 btnOpenFile.addEventListener('click', async () => {
   // Destructure the one-element array.
-  [fileHandle] = await window.showOpenFilePicker();
+  [pickFileHandle] = await window.showOpenFilePicker();
   // Do something with the file handle.
   openFileFunc(fileHandle)
 
 });
-async function openFileFunc(fileHandle){
-    let  permission = await verifyPermission(fileHandle, false);
+async function openFileFunc(pickFileHandle){
+    let  permission = await verifyPermission(pickFileHandle, true);
     console.log(permission);
   if( permission) {
                 console.log('permission Granted, reading file: ')
-        const file = await fileHandle.getFile();
+        const file = await pickFileHandle.getFile();
         const contents = await file.text();
         console.log(contents);
         const obj = JSON.parse(contents);
@@ -83,7 +84,7 @@ async function openFileFunc(fileHandle){
         stateLayer.destroyChildren();
         arrowLayer.destroyChildren();
         let stateNameArr = Object.keys(obj.state);
-
+        globalCode = obj.globalCode;
         for (let idx = 0;idx < stateNameArr.length;idx++){
             let stateName = stateNameArr[idx];
             addState(obj.state[stateName])
@@ -93,6 +94,8 @@ async function openFileFunc(fileHandle){
             let arrowName = arrowNameArr[idx];
             createNewArrow(obj.arrow[arrowName])
         }
+
+        fileHandle = pickFileHandle;
     }
     else {
                 alert('permission refused')
@@ -107,17 +110,22 @@ btnSaveFile.addEventListener('click', async () => {
 
 async function saveFileFunc(){
     console.log('saveFile');
+
     try {
-        const fileHandle = await self.showSaveFilePicker({
-          suggestedName: 'untitled',
-          types: [
-            {
-              description: "Text file",
-              accept: {'text/plain': ['.txt']},
-              // ...
-            },
-          ],
-        });
+        if (fileHandle == null){
+            console.log('Save new file');
+            fileHandle = await self.showSaveFilePicker({
+                suggestedName: 'Untitled-FSM',
+                types: [
+                    {
+                        description: "Text file",
+                        accept: {'text/plain': ['.txt']},
+                        // ...
+                    },
+                ],
+            });
+        }
+
 
         const writeFile = async (fileHandle, contents) => {
             // Create a FileSystemWritableFileStream to write to.
@@ -132,6 +140,7 @@ async function saveFileFunc(){
         let data = {};
         data.state = {};
         data.arrow = {};
+        data.globalCode = globalCode;
         for (let idx = 0; idx < stateLayer.children.length; idx++){
             let child = stateLayer.children[idx]
             if (child.name() == 'state'){
@@ -146,6 +155,7 @@ async function saveFileFunc(){
                 data.state[stateName].x = child.x();
                 data.state[stateName].y = child.y();
                 data.state[stateName].radius = child.radius();
+                data.state[stateName].code = child.code;
 
             }
 
@@ -163,6 +173,7 @@ async function saveFileFunc(){
             data.arrow[idx].srcStateIdx = srcStateIdx;
             data.arrow[idx].dstStateIdx = dstStateIdx;
             data.arrow[idx].points = points;
+            data.arrow[idx].code = child.code;
         }
         console.log(data)
         let writeContent = JSON.stringify(data, null, 4);

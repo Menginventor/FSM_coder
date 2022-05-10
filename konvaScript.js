@@ -1,5 +1,9 @@
 const selectToolEle = document.getElementById("selectTool");
 const connectToolEle = document.getElementById("connectTool");
+const codeHeaderEle = document.getElementById("codeHeader");
+
+var globalCode = '';
+
 var width = window.innerWidth;
 var height = window.innerHeight;
 var sceneWidth = height;
@@ -59,12 +63,13 @@ function addState(property){
     let stateRadius = 50;
     let stateFill = 'white';
     let stateText = 'State' + (stateCount()+1);
+    let stateCode = '';
     if (property != null){
         console.log('Create state with pre-define property');
         stateX = property.x;
         stateY = property.y;
         stateRadius = property.radius;
-
+        stateCode = property.code;
         stateText = property.text;
         if (stateText == 'init')stateFill = 'lime';
 
@@ -98,6 +103,7 @@ function addState(property){
         y: circle.y() - stateRadius,
     })
     circle.state_text = state_text;
+    circle.code = stateCode;
     circle.on('dragmove', function () {
         circle.state_text.x(circle.x() - circle.state_text.width()/2);
         circle.state_text.y(circle.y() - circle.state_text.height()/2);
@@ -107,6 +113,15 @@ function addState(property){
                 let arrowPoints = arrow.points();
                 arrowPoints[0] = circle.x();
                 arrowPoints[1] = circle.y();
+                //arrow.points(arrowPoints);
+                /* update dst */
+
+                let lastPointX = arrowPoints[arrowPoints.length -4];
+                let lastPointY = arrowPoints[arrowPoints.length -3];
+                let angleOfAttach = Math.atan2(lastPointY - arrow.dstState.y(),lastPointX - arrow.dstState.x());
+                let attachRadius = arrow.dstState.radius() + arrow.dstState.strokeWidth();
+                arrowPoints[arrowPoints.length -2] = arrow.dstState.x() + attachRadius*Math.cos(angleOfAttach);
+                arrowPoints[arrowPoints.length -1] = arrow.dstState.y() + attachRadius*Math.sin(angleOfAttach);
                 arrow.points(arrowPoints);
             }
             // if-if fir recurrent transistion
@@ -414,11 +429,7 @@ stage.on('click tap', function (e) {
         }
 
         // if click on empty area - remove all selections
-        if (e.target === stage) {
-          tr.nodes([]);
-           console.log('stage clicked');
-//          return;
-        }
+
 
         // do nothing if clicked NOT on our rectangles
         //console.log(e.target);
@@ -432,6 +443,9 @@ stage.on('click tap', function (e) {
               // if no key pressed and the node is not selected
               // select just one
               tr.nodes([e.target]);
+
+              codeHeaderEle.innerText = 'State: '+e.target.state_text.text();
+              editor.session.setValue(e.target.code,-1);
 
             }
             else if (metaPressed && isSelected) {
@@ -449,6 +463,8 @@ stage.on('click tap', function (e) {
 
         }
         if (e.target.hasName('arrow')) {
+        tr.nodes([]);
+
             e.target.stroke('blue');
             e.target.fill('blue');
             if (selectedArrow != null){
@@ -458,20 +474,33 @@ stage.on('click tap', function (e) {
             }
 
             selectedArrow = e.target;
+            codeHeaderEle.innerText = 'Transition';
             console.log('arrow clicked');
+            console.log(e.target.code)
+            editor.session.setValue(e.target.code,-1);
+
+            selectedArrow.fill('blue');
+            selectedArrow.stroke('blue');
             showArrowPoints(selectedArrow);
         }
         else  if (e.target.hasName('arrowPoint')) {
             //Do nothing
         }
         else{
-            console.log('not arrow');
+            //console.log('not arrow');
           if (selectedArrow != null){
                     selectedArrow.stroke('black');
                     selectedArrow.fill('black');
             }
             selectedArrow = null;
             destrosArrowPoints();
+        }
+           if (e.target === stage) {
+          tr.nodes([]);
+           console.log('stage clicked');
+           codeHeaderEle.innerText = 'Global scope';
+           editor.session.setValue(globalCode,-1);
+//          return;
         }
 
     }
@@ -544,9 +573,11 @@ function createNewArrow(property){
         strokeScaleEnabled: true,
         name : 'arrow',
     });
+    arrow.code = '';
     if (property != null){
         arrow.srcState = stateLayer.children[property.srcStateIdx];
         arrow.dstState = stateLayer.children[property.dstStateIdx];
+        arrow.code = property.code;
     }
     arrow.on('mouseover', function () {
         this.fill('blue');
@@ -554,9 +585,12 @@ function createNewArrow(property){
         this.strokeWidth(8);
     });
     arrow.on('mouseout', function () {
+        if (this != selectedArrow){
+            this.fill('black');
+            this.stroke('black');
+        }
 
-        this.fill('black');
-        this.stroke('black');
+
          this.strokeWidth(2);
 
     });
