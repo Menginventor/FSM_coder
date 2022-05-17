@@ -9,6 +9,7 @@ editor.session.on('change', function(delta) {
     else  if (selectedArrow != null){
         console.log('update arrow code');
         selectedArrow.code = editor.getValue();
+        selectedArrow.text.text(editor.getValue());
     }
     else if (eleList.length == 0 && codeHeaderEle.innerText == 'Global scope'){
         console.log('update global code')

@@ -276,7 +276,7 @@ function fitStageIntoParentContainer() {
     let rowContainerWidth = rowContainer.offsetWidth;
 
     stage.width(rowContainerWidth - codeColumn.offsetWidth-30);
-    stage.height(container.offsetHeight-4.8);
+    stage.height(container.offsetHeight - 10);
 
     editor.style.height = (rowContainer.offsetHeight-80)+'px';
 
@@ -471,6 +471,7 @@ stage.on('click tap', function (e) {
                 //reset previous selectedArrow
                 selectedArrow.stroke('black');
                 selectedArrow.fill('black');
+                selectedArrow.text.fill('black');
             }
 
             selectedArrow = e.target;
@@ -491,6 +492,7 @@ stage.on('click tap', function (e) {
           if (selectedArrow != null){
                     selectedArrow.stroke('black');
                     selectedArrow.fill('black');
+                    selectedArrow.text.fill('black');
             }
             selectedArrow = null;
             destrosArrowPoints();
@@ -508,16 +510,39 @@ stage.on('click tap', function (e) {
         if (e.target.hasName('state')) {
             e.target.stroke('blue')
             e.target.strokeWidth(4);
-            if (srcConNode == null){
+            if (srcConNode == null){ // select source node
                 srcConNode = e.target;
                 console.log(srcConNode);
                 newArrow = createNewArrow();
             }
-            else{
+            else{ // select destination node
 
             ////
                 newArrow.srcState = srcConNode;
                 newArrow.dstState = e.target;
+                let textX,textY;
+                arrowPoints = newArrow.points();
+                if (arrowPoints.length%4 == 0){
+                    console.log('Even arrow point');
+                    textX = (arrowPoints[arrowPoints.length/2-2] + arrowPoints[arrowPoints.length/2])/2;
+                    textY = (arrowPoints[arrowPoints.length/2-1] + arrowPoints[arrowPoints.length/2+1])/2;
+                     console.log((arrowPoints.length))
+                     console.log(arrowPoints.length/2-2)
+                    console.log(arrowPoints.length/2-1)
+
+                }
+                else {
+                    console.log('Odd arrow point');
+                    textX = arrowPoints[arrowPoints.length/2 - 1];
+                    textY = arrowPoints[arrowPoints.length/2];
+                    console.log((arrowPoints.length))
+                     console.log(parseInt(arrowPoints.length/4))
+                    console.log(parseInt(arrowPoints.length/4+1))
+                }
+                console.log(textX)
+                console.log(textY)
+                newArrow.text.x(textX);
+                newArrow.text.y(textY);
                 srcConNode.stroke('black')
                 srcConNode.strokeWidth(2);
                 srcConNode = null;
@@ -548,15 +573,22 @@ stage.on('click tap', function (e) {
 function createNewArrow(property){
     let arrowPoints = [];
     let eventListening = false;
+    let textX;
+    let textY;
     if (property != null){
         console.log('Create arrow with pre-difined property');
         console.log(property);
         arrowPoints = property.points;
         eventListening = true;
+        textX = property.textX;
+        textY = property.textY;
+
 
     }
     else{
         arrowPoints = [srcConNode.x(), srcConNode.y(),srcConNode.x(), srcConNode.y()];
+        textX = arrowPoints[0];
+        textY = arrowPoints[1];
     }
 
     let arrow = new Konva.Arrow({
@@ -581,12 +613,15 @@ function createNewArrow(property){
     }
     arrow.on('mouseover', function () {
         this.fill('blue');
+        this.text.fill('blue');
         this.stroke('blue');
         this.strokeWidth(8);
     });
     arrow.on('mouseout', function () {
         if (this != selectedArrow){
             this.fill('black');
+            this.text.fill('black');
+
             this.stroke('black');
         }
 
@@ -631,6 +666,23 @@ function createNewArrow(property){
 
     });
     arrowLayer.add(arrow);
+    let arrow_text = new Konva.Text({
+        name : 'arrowText',
+        text: arrow.code,
+        fontSize: 18,
+        fontFamily: 'Calibri',
+        fill: '#000',
+
+        padding: 5,
+        align: 'center',
+        listening : true,
+        draggable: true,
+        verticalAlign: 'middle',
+        x: textX,
+        y: textY,
+    })
+    arrow.text = arrow_text;
+    arrowLayer.add(arrow_text);
     return arrow;
 }
 function destrosArrowPoints(){

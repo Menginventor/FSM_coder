@@ -196,18 +196,22 @@ async function saveFileFunc(){
         }
         for (let idx = 0; idx < arrowLayer.children.length; idx++){
             let child = arrowLayer.children[idx]
-            console.log(child);
-            console.log(child.srcState);
-            console.log(child.srcState.state_text);
-            console.log(child.srcState.state_text.text());
-            let srcStateIdx = child.srcState.index;
-            let dstStateIdx = child.dstState.index;
-            let points = child.points();
-            data.arrow[idx] = {};
-            data.arrow[idx].srcStateIdx = srcStateIdx;
-            data.arrow[idx].dstStateIdx = dstStateIdx;
-            data.arrow[idx].points = points;
-            data.arrow[idx].code = child.code;
+            if (child.name() == 'arrow'){
+                console.log(child.name());
+                console.log(child.srcState);
+                console.log(child.srcState.state_text);
+                console.log(child.srcState.state_text.text());
+                let srcStateIdx = child.srcState.index;
+                let dstStateIdx = child.dstState.index;
+                let points = child.points();
+                data.arrow[idx] = {};
+                data.arrow[idx].srcStateIdx = srcStateIdx;
+                data.arrow[idx].dstStateIdx = dstStateIdx;
+                data.arrow[idx].points = points;
+                data.arrow[idx].code = child.code;
+                data.arrow[idx].textX = child.text.x();
+                data.arrow[idx].textY = child.text.y();
+            }
         }
         console.log(data)
         let writeContent = JSON.stringify(data, null, 4);
@@ -287,6 +291,8 @@ async function saveAsFunc(){
             data.arrow[idx].dstStateIdx = dstStateIdx;
             data.arrow[idx].points = points;
             data.arrow[idx].code = child.code;
+            data.arrow[idx].textX = child.text.x();
+            data.arrow[idx].textY = child.text.y();
         }
         console.log(data)
         let writeContent = JSON.stringify(data, null, 4);
