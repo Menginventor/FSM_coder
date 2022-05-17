@@ -10,6 +10,7 @@
 - [ ] add code to shape and initial code
 - [ ] generate .ino file
 - [ ] Add text object (help visualization the FSM diagram)
+- [ ] Show brower support
 
 ## Minor
 - [ ] Fit to screen
