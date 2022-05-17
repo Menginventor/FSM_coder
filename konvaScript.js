@@ -2,8 +2,26 @@ const selectToolEle = document.getElementById("selectTool");
 const connectToolEle = document.getElementById("connectTool");
 const codeHeaderEle = document.getElementById("codeHeader");
 
-var globalCode = 'void setup(){\n\n}\nvoid loop(){\n\n}\n';
 
+const default_globalCode = `void setup(){
+    fsm_init();//initialize FSM, Needed
+}
+void loop(){
+    fsm_update();//update FSM, Needed
+}
+`
+
+const default_stateCode = `// Declare local/static variable here.
+
+if (fsm_enter_state_flag){
+    //Run once when enter this state.
+
+}
+//Run repeatly for update.
+
+`
+
+var globalCode = default_globalCode;
 var width = window.innerWidth;
 var height = window.innerHeight;
 var sceneWidth = height;
@@ -63,7 +81,7 @@ function addState(property){
     let stateRadius = 50;
     let stateFill = 'white';
     let stateText = 'State' + (stateCount()+1);
-    let stateCode = '';
+    let stateCode = default_stateCode;
     if (property != null){
         console.log('Create state with pre-define property');
         stateX = property.x;
