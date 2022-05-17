@@ -18,3 +18,4 @@
 - [ ] implement undo - redo
 - [ ] Debug mode (Show state transition in Serial monitor)
 - [ ] Real-time debug (Connect web browser to Serial port)
+- [ ] Add more state machine to single project
