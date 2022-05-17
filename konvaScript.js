@@ -294,7 +294,7 @@ function fitStageIntoParentContainer() {
     let rowContainerWidth = rowContainer.offsetWidth;
 
     stage.width(rowContainerWidth - codeColumn.offsetWidth-30);
-    stage.height(container.offsetHeight - 10);
+    stage.height(container.offsetHeight - 30);
 
     editor.style.height = (rowContainer.offsetHeight-80)+'px';
 
