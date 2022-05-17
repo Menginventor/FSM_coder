@@ -9,6 +9,7 @@
 - [x] Save, Save as, New
 - [x] add code to shape and initial code
 - [x] generate .ino file
+- [ ] Arrow text
 - [ ] Add text object (help visualization the FSM diagram)
 - [ ] Show brower support
 
