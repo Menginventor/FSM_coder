@@ -43,7 +43,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
             <li class="nav-item dropdown">
                 <a href="#" class="nav-link " data-bs-toggle="dropdown">File</a>
                 <div class="dropdown-menu">
-                    <a href="#" class="dropdown-item">New</a>
+                    <a id = 'newFile' href="#" class="dropdown-item">New</a>
                     <a id = 'openFile' href="#" class="dropdown-item">Open</a>
                     <a id = 'saveFile' href="#" class="dropdown-item">Save</a>
                     <a id = 'saveAs' href="#" class="dropdown-item">Save as</a>
@@ -62,18 +62,12 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
             <li class="nav-item dropdown">
                 <a href="#" class="nav-link " data-bs-toggle="dropdown">Tools</a>
                 <div class="dropdown-menu">
-                    <a href="#" class="dropdown-item">Generate .ino file</a>
+                    <a id = 'generateIno' href="#" class="dropdown-item">Generate .ino file</a>
 
 
                 </div>
             </li>
-            <li class="nav-item dropdown">
-                <a href="#" class="nav-link " data-bs-toggle="dropdown">View</a>
-                <div class="dropdown-menu">
-                    <a href="#" class="dropdown-item disabled">(For future dev)</a>
 
-                </div>
-            </li>
         </ul>
         <ul class="nav navbar-nav ms-auto">
             <li class="nav-item ">
@@ -83,7 +77,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
         </div>
         </div>
         </nav>
-  <h3 id = 'fileName'>Untitled</h3>
+  <h3 id = 'fileName'>Unsaved file</h3>
         <div class="my-2">
 
         <button class="btn btn-primary" onclick="addState()">Add State</button>

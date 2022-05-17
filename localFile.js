@@ -5,6 +5,11 @@ var DBOpenRequest = window.indexedDB.open("recentFileDB");
 window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
 
 var db;
+
+const btnRecentFile = document.getElementById('recentFile');
+const fileNameEle = document.getElementById('fileName');
+
+
  DBOpenRequest.onerror = function(event) {
 
     alert('Error loading database.');
@@ -37,7 +42,6 @@ DBOpenRequest.onupgradeneeded = function(event) {
 
 };
 
-const btnRecentFile = document.getElementById('recentFile');
 
 btnRecentFile.addEventListener('click', async () => {
     console.log('Recent file clicked');
@@ -68,7 +72,7 @@ btnOpenFile.addEventListener('click', async () => {
   // Destructure the one-element array.
   [pickFileHandle] = await window.showOpenFilePicker();
   // Do something with the file handle.
-  openFileFunc(fileHandle)
+  openFileFunc(pickFileHandle)
 
 });
 async function openFileFunc(pickFileHandle){
@@ -85,6 +89,7 @@ async function openFileFunc(pickFileHandle){
         arrowLayer.destroyChildren();
         let stateNameArr = Object.keys(obj.state);
         globalCode = obj.globalCode;
+
         for (let idx = 0;idx < stateNameArr.length;idx++){
             let stateName = stateNameArr[idx];
             addState(obj.state[stateName])
@@ -100,11 +105,33 @@ async function openFileFunc(pickFileHandle){
            editor.session.setValue(globalCode,-1);
 
         fileHandle = pickFileHandle;
+        fileNameEle.innerText = fileHandle.name;
     }
     else {
-                alert('permission refused')
+                console.error('permission refused')
     }
 }
+btnNewFile = document.getElementById('newFile');
+btnNewFile.addEventListener('click', async () => {
+   newFileFunc();
+});
+function newFileFunc(){
+    console.log('new file');
+    fileHandle = null;
+    stateLayer.destroyChildren();
+    arrowLayer.destroyChildren();
+    globalCode = 'void setup(){\n\n}\nvoid loop(){\n\n}\n';
+    initState = addState();
+    initState.state_text.text('init');
+    initState.fill('lime');
+    tr.nodes([]);
+    selectedArrow = null;
+    codeHeaderEle.innerText = 'Global scope';
+    editor.session.setValue(globalCode,-1);
+    fileNameEle.innerText = 'Unsaved file';
+
+}
+
 
 btnSaveFile = document.getElementById('saveFile');
 btnSaveAs = document.getElementById('saveAs');
@@ -188,6 +215,7 @@ async function saveFileFunc(){
         writeFile(fileHandle,writeContent).then(() => console.log("File saved!!!"));
         addRecentFilePath(fileHandle);
         console.log(fileHandle);
+        fileNameEle.innerText = fileHandle.name;
       } catch (error) {
         console.error(error);
       }
@@ -267,6 +295,7 @@ async function saveAsFunc(){
         addRecentFilePath(pickFileHandle);
         console.log(pickFileHandle);
         fileHandle = pickFileHandle
+        fileNameEle.innerText = fileHandle.name;
       } catch (error) {
         console.error(error);
       }
@@ -353,11 +382,11 @@ function addRecentFilePath(fileHandle){
 
     // report on the success of opening the transaction
     transaction.oncomplete = event => {
-      alert('transaaction complete');
+      console.log('transaaction complete');
     };
 
     transaction.onerror = event => {
-      alert('transaction error');
+      console.error('transaction error');
     };
 
     let newItem = [
@@ -366,7 +395,7 @@ function addRecentFilePath(fileHandle){
         let objectStore = transaction.objectStore("recentFile");
      let objectStoreRequest = objectStore.put(newItem[0]);
         objectStoreRequest.onsuccess = function(event) {
-        alert('objectStoreRequest onsuccess');
+        console.log('objectStoreRequest onsuccess');
     }
 }
 

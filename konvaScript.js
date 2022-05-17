@@ -2,7 +2,7 @@ const selectToolEle = document.getElementById("selectTool");
 const connectToolEle = document.getElementById("connectTool");
 const codeHeaderEle = document.getElementById("codeHeader");
 
-var globalCode = '';
+var globalCode = 'void setup(){\n\n}\nvoid loop(){\n\n}\n';
 
 var width = window.innerWidth;
 var height = window.innerHeight;
@@ -904,6 +904,7 @@ function p2segDist(A,  B,  E){
 stage.add(arrowLayer);
 stage.add(stateLayer);
 stage.add(topLayer);
+editor.session.setValue(globalCode,-1);
 var container = stage.container();
 
 // make it focusable
@@ -954,6 +955,3 @@ function deleteShape(){
 var initState = addState();
 initState.state_text.text('init');
 initState.fill('lime');
-initState.on('dblclick dbltap', () => {
-    console.log('init dbclick')
-});
