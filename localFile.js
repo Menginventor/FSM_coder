@@ -142,7 +142,7 @@ function newFileFunc(){
     fileHandle = null;
     stateLayer.destroyChildren();
     arrowLayer.destroyChildren();
-    globalCode = 'void setup(){\n\n}\nvoid loop(){\n\n}\n';
+    globalCode = default_globalCode;
     initState = addState();
     initState.state_text.text('init');
     initState.fill('lime');

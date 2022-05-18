@@ -70,6 +70,22 @@ function stateCount (){
     }
     return count;
 }
+function uniqueStateName(){
+    let stateIdx = 1;
+    let nameArr = []
+    let stateArr = stateLayer.find('.state');
+     for (let idx = 0; idx < stateArr.length; idx++){
+        nameArr.push(stateArr[idx].state_text.text())
+    }
+    for(let idx = stateArr.length;idx < 99999;idx++){
+         console.log(nameArr.indexOf('State'+idx));
+         if (nameArr.indexOf('State'+idx) == -1){
+            return 'State'+idx;
+         }
+    }
+
+
+}
 function addState(property){
 
   let oldScale = stage.scaleX();
@@ -80,7 +96,7 @@ function addState(property){
     let stateY = centerY+Math.random() * 20;
     let stateRadius = 50;
     let stateFill = 'white';
-    let stateText = 'State' + (stateCount()+1);
+    let stateText = uniqueStateName();
     let stateCode = default_stateCode;
     if (property != null){
         console.log('Create state with pre-define property');
