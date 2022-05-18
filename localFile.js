@@ -5,8 +5,30 @@ var DBOpenRequest = window.indexedDB.open("recentFileDB");
 window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
 
 var db;
-
 const btnRecentFile = document.getElementById('recentFile');
+
+
+// function from https://stackoverflow.com/a/15832662/512042
+function downloadURI(uri, name) {
+    var link = document.createElement('a');
+    link.download = name;
+    link.href = uri;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    delete link;
+}
+
+const btnSaveAsImage = document.getElementById('saveAsImage');
+btnSaveAsImage.addEventListener('click', async () => {
+    var dataURL = stage.toDataURL({ pixelRatio: 3 });
+
+    downloadURI(dataURL, fileNameEle.innerText.split('.')[0] +'.png');
+});
+
+
+
+
 const fileNameEle = document.getElementById('fileName');
 
 
@@ -348,7 +370,7 @@ async function writeFile(fileHandle, contents) {
 }
 document.addEventListener('keydown', (event) => {
   const keyName = event.key;
-
+    console.log(keyName)
   if (keyName === 'Control') {
     // do not alert when only Control key is pressed.
     return;
