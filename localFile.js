@@ -24,7 +24,7 @@ DBOpenRequest.onsuccess = function(event) {
 };
 
 DBOpenRequest.onupgradeneeded = function(event) {
-    alert('DB upgraded!!')
+    console.log('DB upgraded!!')
     let db = event.target.result;
 
     db.onerror = function(event) {
