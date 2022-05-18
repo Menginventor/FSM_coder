@@ -296,6 +296,7 @@ function addState(property){
 
     stateLayer.add(circle);
     stateLayer.add(state_text);
+    if (property == null)tr.nodes([circle]);
     return circle;
 
 }
@@ -1074,4 +1075,4 @@ function deleteShape(){
 var initState = addState();
 initState.state_text.text('init');
 initState.fill('lime');
-
+tr.nodes([])
