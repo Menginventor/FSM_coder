@@ -283,6 +283,39 @@ function addState(property){
     return circle;
 
 }
+
+function zoomFit(){
+    console.log('Zoom to fit');
+    tr.nodes(stateLayer.children);
+    tr.nodes(tr.nodes().concat(arrowLayer.children))
+
+
+    let oldScale = stage.scaleX();
+
+    let newX =  (tr.x() - stage.x()) / oldScale;
+    let newY = (tr.y() - stage.y()) / oldScale;
+
+    let newW = tr.width()/stage.scaleX();
+    let newH = tr.height()/stage.scaleX();
+
+     console.log('newW',newW);
+    console.log('newH',newH);
+
+    let scaleX = stage.width()/newW;
+    let scaleY = stage.height()/newH;
+    let scaleMin =  Math.min(scaleX, scaleY)*0.9;
+    console.log('scaleMin',scaleMin)
+    stage.scale({ x: scaleMin, y: scaleMin });
+
+    let scaleW = newW*scaleMin;
+    let scaleH = newH*scaleMin;
+    let newPos = {
+      x: -newX*scaleMin + (stage.width() - scaleW)/2,
+      y: -newY*scaleMin + (stage.height() - scaleH)/2,
+    };
+    stage.position(newPos);
+    tr.nodes([]);
+}
 function fitStageIntoParentContainer() {
     let container = document.querySelector('#container');
     let editor = document.querySelector('#editor');
@@ -1025,3 +1058,4 @@ function deleteShape(){
 var initState = addState();
 initState.state_text.text('init');
 initState.fill('lime');
+
