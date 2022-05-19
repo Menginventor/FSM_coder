@@ -1,4 +1,4 @@
-## Mojor
+## Major
 - [x] drag and drop Konva shape
 - [x] Zoomable Konva stage
 - [x] Stage pan tool
@@ -9,13 +9,18 @@
 - [x] Save, Save as, New
 - [x] add code to shape and initial code
 - [x] generate .ino file
-- [ ] Arrow text
+- [x] Arrow text
 - [ ] Add text object (help visualization the FSM diagram)
 - [ ] Show brower support
+- [ ] Copy and paste
+- [ ] User manual/Tutorial
 
 ## Minor
-- [ ] Fit shape to screen
+- [x] Fit shape to screen
+- [x] Save diagram as image
 - [ ] implement undo - redo
 - [ ] Debug mode (Show state transition in Serial monitor)
 - [ ] Real-time debug (Connect web browser to Serial port)
 - [ ] Add more state machine to single project
+- [ ] Sub-FSM (Combine into single block like subsystem)
+- [ ] Signal tools (update realtime signal)
