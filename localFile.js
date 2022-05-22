@@ -384,7 +384,7 @@ document.addEventListener('keydown', (event) => {
     //alert(`Combination of ctrlKey + ${keyName}`);
     if (keyName == 's'){
         event.preventDefault();
-        alert('Saved');
+        //alert('Saved');
          saveFileFunc();
     }
 
