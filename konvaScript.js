@@ -33,6 +33,7 @@ container: 'container',
 width: width/2,
 height: height,
 });
+var backgroundLayer = new Konva.Layer();
 var arrowLayer = new Konva.Layer();
 var stateLayer = new Konva.Layer();
 var topLayer = new Konva.Layer();
@@ -332,6 +333,7 @@ function zoomFit(){
     };
     stage.position(newPos);
     tr.nodes([]);
+    backgroundShapeUpdate();
 }
 function fitStageIntoParentContainer() {
     let container = document.querySelector('#container');
@@ -911,6 +913,8 @@ stage.on('wheel', (e) => {
       y: pointer.y - mousePointTo.y * newScale,
     };
     stage.position(newPos);
+backgroundShapeUpdate();
+
 });
 
 function  mousePointToStage(){
@@ -1018,9 +1022,29 @@ function p2segDist(A,  B,  E){
     return ret;
 }
 
+var background = new Konva.Rect({
+    x: 0,
+    y: 0,
+    width: stage.width(),
+    height: stage.height(),
+   fill : 'white',
 
+    // remove background from hit graph for better perf
+    // because we don't need any events on the background
+    listening: false,
+});
+backgroundLayer.add(background);
+stage.on('dragmove', () => {
+backgroundShapeUpdate();
+  });
+function backgroundShapeUpdate(){
+    background.absolutePosition({ x: 0, y: 0 });
+     background.width(stage.width()/stage.scaleX());
+      background.height(stage.height()/stage.scaleX());
 
-
+     console.log(stage.scaleX());
+}
+stage.add(backgroundLayer);
 stage.add(arrowLayer);
 stage.add(stateLayer);
 stage.add(topLayer);

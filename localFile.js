@@ -128,6 +128,8 @@ async function openFileFunc(pickFileHandle){
 
         fileHandle = pickFileHandle;
         fileNameEle.innerText = fileHandle.name;
+        addRecentFilePath(pickFileHandle);
+         zoomFit();
     }
     else {
                 console.error('permission refused')
@@ -151,7 +153,7 @@ function newFileFunc(){
     codeHeaderEle.innerText = 'Global scope';
     editor.session.setValue(globalCode,-1);
     fileNameEle.innerText = 'Unsaved file';
-
+    zoomFit();
 }
 
 
