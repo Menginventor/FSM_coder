@@ -347,4 +347,4 @@ stk500.prototype.bootload = function (stream, hex, opt, done) {
   });
 };
 
-module.exports = stk500;
+exports  stk500;
