@@ -36,6 +36,7 @@ height: height,
 var backgroundLayer = new Konva.Layer();
 var arrowLayer = new Konva.Layer();
 var stateLayer = new Konva.Layer();
+var textLayer = new Konva.Layer();
 var topLayer = new Konva.Layer();
 var arrowPointsNode = [];
 var text = new Konva.Text({
@@ -46,8 +47,6 @@ fontSize: 24,
 text: '',
 fill: 'black',
 });
-
-
 
 
 // write out drag and drop events
@@ -87,6 +86,8 @@ function uniqueStateName(){
 
 
 }
+
+
 function addState(property){
 
   let oldScale = stage.scaleX();
@@ -302,6 +303,141 @@ function addState(property){
 
 }
 
+function addText(property){
+
+  let oldScale = stage.scaleX();
+  let centerX =  ((stage.width() / 2) - stage.x()) / oldScale;
+  let centerY =  ((stage.height() / 2)- stage.y()) / oldScale;
+
+    let textX = centerX+Math.random() * 20;
+    let textY = centerY+Math.random() * 20;
+    let text_letter = 'Sample text'
+    let textFill = 'black';
+
+    if (property != null){
+        console.log('Create text with pre-define property');
+        textX = property.x;
+        textY = property.y;
+        stateRadius = property.radius;
+        stateCode = property.code;
+        text_letter = property.text;
+
+
+    }
+
+
+
+    let text = new Konva.Text({
+        name : 'text',
+        text:text_letter,
+        fontSize: 18,
+        fontFamily: 'Calibri',
+        fill: '#000',
+
+
+        padding: 5,
+        align: 'left',
+        verticalAlign: 'middle',
+        x: textX,
+        y: textY,
+        draggable: true,
+    })
+
+
+    text.on('dragmove', function () {
+
+
+    });
+
+
+
+   text.on('dblclick dbltap', () => {
+    tr.nodes([]);// Clear selection
+
+
+        let textPosition = text.getAbsolutePosition();
+
+        // then lets find position of stage container on the page:
+        let stageBox = stage.container().getBoundingClientRect();
+
+        // so position of textarea will be the sum of positions above:
+        let areaPosition = {
+          x: stageBox.left + textPosition.x,
+          y: stageBox.top + textPosition.y,
+        };
+
+        // create textarea and style it
+        let textarea = document.createElement('div');
+        document.body.appendChild(textarea);
+
+       htmlText = text.text().replaceAll('\n','<br>')
+        textarea.innerHTML = '<div>' + htmlText + '</div>' ;
+        textarea.style.position = 'absolute';
+        textarea.style.top = areaPosition.y+1.6 + 'px';
+        textarea.style.left = areaPosition.x+3 + 'px';
+
+         textarea.style.border = 'none';
+        textarea.style.padding = '0px';
+        textarea.style.margin = '0px';
+        textarea.style.overflow = 'hidden';
+        textarea.style.background = 'none';
+
+        textarea.style.lineHeight = text.lineHeight();
+        textarea.style.fontFamily = text.fontFamily();
+         textarea.style.fontSize = text.fontSize()*stage.scaleX() + 'px';
+
+         textarea.contentEditable = 'true';
+         textarea.style.display = 'flex'
+
+
+
+        textarea.focus();
+        textarea.addEventListener('keypress', function (e) {
+        console.log(e);
+                if (e.keyCode === 13 || e.which === 13) {
+                    //e.preventDefault();
+                    if (! e.shiftKey){
+                        e.preventDefault();
+                        //return false;
+                    }
+                    else console.log('detect shift key')
+                }
+
+            })
+         text.hide();
+
+        function removeTextarea() {
+          textarea.parentNode.removeChild(textarea);
+          window.removeEventListener('click', handleOutsideClick);
+          text.show();
+
+        }
+         function handleOutsideClick(e) {
+          if (e.target !== textarea.children[0] && e.target !== textarea) {
+            let new_name = textarea.innerText.trim();
+          text.text(textarea.innerText);
+            removeTextarea();
+          }
+        }
+        setTimeout(() => {
+          window.addEventListener('click', handleOutsideClick);
+        });
+});
+
+    text.on('transform', function () {
+
+
+
+    });
+
+    textLayer.add(text);
+
+    if (property == null)tr.nodes([text]);
+    return text;
+
+}
+
+
 function zoomFit(){
     console.log('Zoom to fit');
     tr.nodes(stateLayer.children);
@@ -336,23 +472,11 @@ function zoomFit(){
     backgroundShapeUpdate();
 }
 function fitStageIntoParentContainer() {
-    let container = $('#container');
-    let editor = document.querySelector('#editor');
-    let rowContainer = document.getElementById('rowContainer');
-    let codeColumn = document.getElementById("codeCol");
-
-    // now we need to fit stage into parent container
-    let rowContainerWidth = rowContainer.offsetWidth-30;
-    let rowContainerHeight = rowContainer.offsetWidth-30;
-
-    let containerWidth = container.width();
-
-
-    stage.width(rowContainerWidth - codeColumn.offsetWidth);
+    let rowContainerWidth = $('#rowContainer').outerWidth()-30
+    stage.width(rowContainerWidth - $('#codeCol').outerWidth());
     stage.height($('#rowContainer').height()-30);
-
-
-    editor.style.height = (rowContainer.offsetHeight-80)+'px';
+    let editor = document.querySelector('#editor');
+    $('#editor').height (rowContainer.offsetHeight-80);
 
 }
 
@@ -529,6 +653,36 @@ stage.on('click tap', function (e) {
             }
 
         }
+        if (e.target.hasName('text')) {
+            console.log('text clicked');
+            // do we pressed shift or ctrl?
+            const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
+            const isSelected = tr.nodes().indexOf(e.target) >= 0;
+
+            if (!metaPressed && !isSelected) {
+              // if no key pressed and the node is not selected
+              // select just one
+              tr.nodes([e.target]);
+
+              codeHeaderEle.innerText = '';
+              editor.session.setValue('',-1);
+
+            }
+            else if (metaPressed && isSelected) {
+              // if we pressed keys and node was selected
+              // we need to remove it from selection:
+              const nodes = tr.nodes().slice(); // use slice to have new copy of array
+              // remove node from array
+              nodes.splice(nodes.indexOf(e.target), 1);
+              tr.nodes(nodes);
+            } else if (metaPressed && !isSelected) {
+              // add the node into selection
+              const nodes = tr.nodes().concat([e.target]);
+              tr.nodes(nodes);
+            }
+
+        }
+
         if (e.target.hasName('arrow')) {
         tr.nodes([]);
 
@@ -1037,13 +1191,13 @@ backgroundShapeUpdate();
 function backgroundShapeUpdate(){
     background.absolutePosition({ x: 0, y: 0 });
      background.width(stage.width()/stage.scaleX());
-      background.height(stage.height()/stage.scaleX());
+     background.height(stage.height()/stage.scaleX());
 
-     console.log(stage.scaleX());
 }
 stage.add(backgroundLayer);
 stage.add(arrowLayer);
 stage.add(stateLayer);
+stage.add(textLayer);
 stage.add(topLayer);
 editor.session.setValue(globalCode,-1);
 var container = stage.container();
