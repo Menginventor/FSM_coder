@@ -116,6 +116,12 @@ async function openFileFunc(pickFileHandle){
             let stateName = stateNameArr[idx];
             addState(obj.state[stateName])
         }
+        let textIdArr = Object.keys(obj.text);
+         for (let idx = 0;idx < textIdArr.length;idx++){
+            let textId = textIdArr[idx];
+            addText(obj.text[textId])
+        }
+
         let arrowNameArr = Object.keys(obj.arrow);
         for (let idx = 0;idx < arrowNameArr.length;idx++){
             let arrowName = arrowNameArr[idx];
@@ -197,6 +203,7 @@ async function saveFileFunc(){
 
         let data = {};
         data.state = {};
+        data.text = {};
         data.arrow = {};
         data.globalCode = globalCode;
         for (let idx = 0; idx < stateLayer.children.length; idx++){
@@ -218,6 +225,32 @@ async function saveFileFunc(){
             }
 
         }
+
+        for (let idx = 0; idx < textLayer.children.length; idx++){
+            let child = textLayer.children[idx]
+
+            if (child.name() == 'text'){
+
+                console.log(child.text())
+                console.log(child.x());
+                console.log(child.y());
+
+                let textLetter = child.text();
+                data.text[idx] = {};
+                data.text[idx].text = child.text();
+                data.text[idx].x = child.x();
+                data.text[idx].y = child.y();
+                data.text[idx].scaleX = child.scaleX();
+                data.text[idx].scaleY = child.scaleY();
+
+
+            }
+            else{
+                console.error('got something else')
+            }
+
+        }
+
         for (let idx = 0; idx < arrowLayer.children.length; idx++){
             let child = arrowLayer.children[idx]
             if (child.name() == 'arrow'){

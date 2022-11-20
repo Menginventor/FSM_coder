@@ -318,8 +318,8 @@ function addText(property){
         console.log('Create text with pre-define property');
         textX = property.x;
         textY = property.y;
-        stateRadius = property.radius;
-        stateCode = property.code;
+        scaleX = property.scaleX;
+        scaleY = property.scaleY;
         text_letter = property.text;
 
 
@@ -340,6 +340,8 @@ function addText(property){
         verticalAlign: 'middle',
         x: textX,
         y: textY,
+        scaleX : scaleX,
+        scaleY : scaleY,
         draggable: true,
     })
 
@@ -442,7 +444,7 @@ function zoomFit(){
     console.log('Zoom to fit');
     tr.nodes(stateLayer.children);
     tr.nodes(tr.nodes().concat(arrowLayer.children))
-
+    tr.nodes(tr.nodes().concat(textLayer.children))
 
     let oldScale = stage.scaleX();
 
