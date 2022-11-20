@@ -336,27 +336,24 @@ function zoomFit(){
     backgroundShapeUpdate();
 }
 function fitStageIntoParentContainer() {
-    let container = document.querySelector('#container');
+    let container = $('#container');
     let editor = document.querySelector('#editor');
     let rowContainer = document.getElementById('rowContainer');
     let codeColumn = document.getElementById("codeCol");
 
     // now we need to fit stage into parent container
-    let containerWidth = container.offsetWidth;
-    let rowContainerWidth = rowContainer.offsetWidth;
+    let rowContainerWidth = rowContainer.offsetWidth-30;
+    let rowContainerHeight = rowContainer.offsetWidth-30;
 
-    stage.width(rowContainerWidth - codeColumn.offsetWidth-30);
-    stage.height(container.offsetHeight - 30);
+    let containerWidth = container.width();
+
+
+    stage.width(rowContainerWidth - codeColumn.offsetWidth);
+    stage.height($('#rowContainer').height()-30);
+
 
     editor.style.height = (rowContainer.offsetHeight-80)+'px';
 
-    // but we also make the full scene visible
-    // so we need to scale all objects on canvas
-
-    //stage.width(sceneWidth * scale);
-    //stage.width(container.offsetWidth*0.5);
-    //stage.height(sceneHeight * scale);
-    //stage.scale({ x: scale, y: scale });
 }
 
 fitStageIntoParentContainer();
