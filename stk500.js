@@ -347,4 +347,30 @@ stk500.prototype.bootload = function (stream, hex, opt, done) {
   });
 };
 
-exports  stk500;
+function readTextFile(file)
+{
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function ()
+    {
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+                var allText = rawFile.responseText;
+                console.log(allText);
+                uploadCode(allText);
+            }
+        }
+    }
+    rawFile.send(null);
+}
+
+function uploadCode(str){
+
+    navigator.serial.getPorts().then((ports) => {
+  // Initialize the list of available ports with `ports` on page load.
+    });
+}
+
+readTextFile("Blink.cpp.hex");
