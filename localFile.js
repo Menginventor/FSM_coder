@@ -95,7 +95,6 @@ btnOpenFile.addEventListener('click', async () => {
   [pickFileHandle] = await window.showOpenFilePicker();
   // Do something with the file handle.
   openFileFunc(pickFileHandle)
-
 });
 async function openFileFunc(pickFileHandle){
     let  permission = await verifyPermission(pickFileHandle, true);

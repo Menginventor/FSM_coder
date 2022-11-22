@@ -1,4 +1,6 @@
 //https://codesandbox.io/s/arduino-simulator-js-9z159?file=/src/App.js:76-110
+
+
 const arduinoCode = `
 void setup() {
   // put your setup code here, to run once:
@@ -12,7 +14,7 @@ void loop() {
   digitalWrite(7, LOW);
   delay(1000);
 }
-error
+
 `;
 
 
@@ -37,5 +39,8 @@ console.log(result);
 console.log(typeof(stderr));
 console.log(stderr);
 console.log(hex);
-
+intelHex = parseIntelHex(hex);
+console.log(intelHex);
 }
+
+runCode()

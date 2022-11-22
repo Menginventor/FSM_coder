@@ -51,7 +51,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
                     <a id = 'openFile' href="#" class="dropdown-item">Open</a>
                     <a id = 'saveFile' href="#" class="dropdown-item">Save</a>
                     <a id = 'saveAs' href="#" class="dropdown-item">Save as</a>
-
                 </div>
             </li>
             <li class="nav-item dropdown">
@@ -94,10 +93,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
         <button class="btn btn-danger" onclick="deleteShape()"><i class="fa-solid fa-trash"></i> Delete</button>
         <button class="btn btn-primary" onclick="zoomFit()" >Zoom to fit</button>
         <button class="btn btn-primary" onclick="toggleCode()" >Toggle Code</button>
-            <button class="btn btn-primary" arduino-uploader hex-href="./blinker.nano.hex" board="uno">
-  Upload blinker to pro-mini and don't verify (faster)
-  <span class="upload-progress"></span>
-</button>
+
         </div>
         <ul class="nav nav-pills my-2">
         <li class="nav-item">
@@ -152,9 +148,11 @@ fitStageIntoParentContainer();
 
 </script>
 <script src="https://github.com/dbuezas/arduino-web-uploader/releases/download/v1.0.0/main.js"></script>
+<script src="https://bundle.run/buffer@6.0.3"></script>
+<script src="hex.js"></script>
 <script src="complier.js"></script>
-<script src="upload.js"></script>
-<script src="stk500.js"></script>
+<script  type="module"  src="stk500.js"></script>
+
 
 </body>
 </html>
