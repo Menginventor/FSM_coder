@@ -598,6 +598,7 @@ stage.on('mouseup touchend', (e) => {
       Konva.Util.haveIntersection(box, shape.getClientRect())
     );
     tr.nodes(selected);
+    container.focus();
 });
 
 stage.on('contextmenu', function (e) {
@@ -732,6 +733,7 @@ stage.on('click tap', function (e) {
            console.log('stage clicked');
            codeHeaderEle.innerText = 'Global scope';
            editor.session.setValue(globalCode,-1);
+           container.focus();
 //          return;
         }
 
@@ -1219,7 +1221,7 @@ stage.add(stateLayer);
 stage.add(textLayer);
 stage.add(topLayer);
 editor.session.setValue(globalCode,-1);
-var container = stage.container();
+const container = stage.container();
 
 // make it focusable
 
