@@ -593,12 +593,30 @@ stage.on('mouseup touchend', (e) => {
       selectionRectangle.visible(false);
     });
 
-    let shapes = stage.find('.state,.text,.arrow');
+    let shapes = stage.find('.state,.text');
     let box = selectionRectangle.getClientRect();
     let selected = shapes.filter((shape) =>
       Konva.Util.haveIntersection(box, shape.getClientRect())
     );
     tr.nodes(selected);
+     if (tr.node != null){
+            let eleList = tr.nodes()
+            for (let idx = 0; idx < arrowLayer.children.length; idx++){
+                let idx_arrow = arrowLayer.children[idx];
+                if ( tr.nodes().includes(idx_arrow.srcState) &&  tr.nodes().includes(idx_arrow.dstState)){
+                    //console.log("Found affected arrow!");
+                    showArrowPoints(idx_arrow);
+                    const oldNodes = tr.nodes();
+                    const newNodes = oldNodes.concat(idx_arrow);
+                    // it is important to set new array instance (and concat method above will create it)
+                    //tr.nodes(newNodes);
+
+
+                }
+
+            }
+    }
+
     container.focus();
 });
 
@@ -868,6 +886,26 @@ function createNewArrow(property){
 
 
          this.strokeWidth(2);
+
+    });
+    arrow.on('dragmove', function () {
+
+        let arrowPoints = arrow.points();
+         for (let idx = 0; idx < arrowPoints.length; idx +=2){
+
+
+
+            if (idx != 0 && idx != arrowPoints.length-2) {
+                let px = arrowPoints[idx]+arrow.x();
+                let py = arrowPoints[idx+1]+arrow.y();
+                arrowPoints[idx] = px;
+                arrowPoints[idx+1] = py;
+            }
+
+
+         }
+         //arrow.x(0);
+         //arrow.y(0);
 
     });
     arrow.on('dblclick dbltap', () => {
@@ -1240,7 +1278,7 @@ container.addEventListener('keydown', function (event) {
 function deleteShape(){
         if (tr.node != null){
             let eleList = tr.nodes()
-            for (let idx = 0;idx < eleList.length; idx++){// looop through selected element
+            for (let idx = 0;idx < eleList.length; idx++){// loop through selected element
                 //check if element is state
                 if (eleList[idx].parent == stateLayer){
                     console.log("element is state");
@@ -1285,3 +1323,16 @@ var initState = addState();
 initState.state_text.text('init');
 initState.fill('lime');
 tr.nodes([])
+tr.on('dragmove', function () {
+    if (tr.node != null){
+            let eleList = tr.nodes()
+            for (let idx = 0; idx < arrowLayer.children.length; idx++){
+                let idx_arrow = arrowLayer.children[idx];
+                if ( tr.nodes().includes(idx_arrow.srcState) &&  tr.nodes().includes(idx_arrow.dstState)){
+                    //console.log("Found affected arrow!");
+                }
+
+            }
+    }
+
+});
