@@ -582,6 +582,7 @@ stage.on('mousemove touchmove', (e) => {
 });
 
 stage.on('mouseup touchend', (e) => {
+    console.log("mouseup touchend");
     // do nothing if we didn't start selection
     if (!selectionRectangle.visible()) {
       return;
@@ -592,7 +593,7 @@ stage.on('mouseup touchend', (e) => {
       selectionRectangle.visible(false);
     });
 
-    let shapes = stage.find('.state,.text');
+    let shapes = stage.find('.state,.text,.arrow');
     let box = selectionRectangle.getClientRect();
     let selected = shapes.filter((shape) =>
       Konva.Util.haveIntersection(box, shape.getClientRect())
@@ -609,9 +610,7 @@ stage.on('contextmenu', function (e) {
           // if we are on empty place of the stage we will do nothing
           return;
         }
-        currentShape = e.target;
-        // show menu
-        menuNode.style.display = 'initial';
+
 
 });
 
@@ -1249,16 +1248,20 @@ function deleteShape(){
                         //
                         arrowLayer.children.forEach(function (arrow) {
                         if (arrow.srcState == eleList[idx]){
-                        arrow.srcState = null;
+                            arrow.srcState = null;
                         }
                         // if-if fir recurrent transistion
                         if (arrow.dstState == eleList[idx]){
-                        arrow.dstState = null;
+                            arrow.dstState = null;
                         }
                         });
                         eleList[idx].state_text.destroy();
                         eleList[idx].destroy();
                     }
+                }
+                else if (eleList[idx].parent == arrowLayer){
+                        eleList[idx].text.destroy();
+                        eleList[idx].destroy();
                 }
                 else{
                     eleList[idx].destroy();
