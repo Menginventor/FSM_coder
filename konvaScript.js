@@ -382,12 +382,8 @@ function addText(property){
         textarea.style.fontFamily = text.fontFamily();
          textarea.style.fontSize = text.fontSize()*stage.scaleX() + 'px';
 
-         textarea.contentEditable = 'true';
-         textarea.style.display = 'block'
-
-
-
-
+        textarea.contentEditable = 'true';
+        textarea.style.display = 'block'
         textarea.focus();
         document.execCommand('selectAll',false,null);
         console.log(textarea)
@@ -604,6 +600,20 @@ stage.on('mouseup touchend', (e) => {
     tr.nodes(selected);
 });
 
+stage.on('contextmenu', function (e) {
+        console.log('contextmenu');
+        // prevent default behavior
+        e.evt.preventDefault();
+        if (e.target === stage) {
+          // if we are on empty place of the stage we will do nothing
+          return;
+        }
+        currentShape = e.target;
+        // show menu
+        menuNode.style.display = 'initial';
+
+});
+
 // clicks should select/deselect shapes
 stage.on('click tap', function (e) {
 
@@ -727,66 +737,76 @@ stage.on('click tap', function (e) {
 
     }
     else if(connectToolEle.classList.contains('active')){
-        if (e.target.hasName('state')) {
-            e.target.stroke('blue')
-            e.target.strokeWidth(4);
-            if (srcConNode == null){ // select source node
-                srcConNode = e.target;
-                console.log(srcConNode);
-                newArrow = createNewArrow();
+        if (e.evt.button == 0){//left mouse button
+            if (e.target.hasName('state')) {
+                e.target.stroke('blue')
+                e.target.strokeWidth(4);
+                if (srcConNode == null){ // select source node
+                    srcConNode = e.target;
+                    console.log(srcConNode);
+                    newArrow = createNewArrow();
+                }
+                else{ // select destination node
+
+                ////
+                    newArrow.srcState = srcConNode;
+                    newArrow.dstState = e.target;
+                    let textX,textY;
+                    arrowPoints = newArrow.points();
+                    if (arrowPoints.length%4 == 0){
+                        console.log('Even arrow point');
+                        textX = (arrowPoints[arrowPoints.length/2-2] + arrowPoints[arrowPoints.length/2])/2;
+                        textY = (arrowPoints[arrowPoints.length/2-1] + arrowPoints[arrowPoints.length/2+1])/2;
+                         console.log((arrowPoints.length))
+                         console.log(arrowPoints.length/2-2)
+                        console.log(arrowPoints.length/2-1)
+
+                    }
+                    else {
+                        console.log('Odd arrow point');
+                        textX = arrowPoints[arrowPoints.length/2 - 1];
+                        textY = arrowPoints[arrowPoints.length/2];
+                        console.log((arrowPoints.length))
+                         console.log(parseInt(arrowPoints.length/4))
+                        console.log(parseInt(arrowPoints.length/4+1))
+                    }
+                    console.log(textX)
+                    console.log(textY)
+                    newArrow.text.x(textX);
+                    newArrow.text.y(textY);
+                    srcConNode.stroke('black')
+                    srcConNode.strokeWidth(2);
+                    srcConNode = null;
+                    stateMouseOver.stroke('black')
+                    stateMouseOver.strokeWidth(2);
+                    newArrow.listening (true);
+                }
+
             }
-            else{ // select destination node
-
-            ////
-                newArrow.srcState = srcConNode;
-                newArrow.dstState = e.target;
-                let textX,textY;
-                arrowPoints = newArrow.points();
-                if (arrowPoints.length%4 == 0){
-                    console.log('Even arrow point');
-                    textX = (arrowPoints[arrowPoints.length/2-2] + arrowPoints[arrowPoints.length/2])/2;
-                    textY = (arrowPoints[arrowPoints.length/2-1] + arrowPoints[arrowPoints.length/2+1])/2;
-                     console.log((arrowPoints.length))
-                     console.log(arrowPoints.length/2-2)
-                    console.log(arrowPoints.length/2-1)
-
+            else if (e.target === stage) {
+                console.log('click on stage')
+                console.log(e.evt.button);
+                if (srcConNode != null){
+                    console.log("Add point to arrow");
+                    mpos = mousePointToStage();
+                    let arrowPoints = newArrow.points();
+                    arrowPoints[arrowPoints.length -2] = mpos.x;
+                    arrowPoints[arrowPoints.length -1] = mpos.y;
+                    newArrow.points(arrowPoints.concat([mpos.x,mpos.y]));
+                    console.log(arrowPoints);
+                    console.log(arrowPoints.concat([mpos.x,mpos.y]));
                 }
-                else {
-                    console.log('Odd arrow point');
-                    textX = arrowPoints[arrowPoints.length/2 - 1];
-                    textY = arrowPoints[arrowPoints.length/2];
-                    console.log((arrowPoints.length))
-                     console.log(parseInt(arrowPoints.length/4))
-                    console.log(parseInt(arrowPoints.length/4+1))
-                }
-                console.log(textX)
-                console.log(textY)
-                newArrow.text.x(textX);
-                newArrow.text.y(textY);
+            }
+        }
+        if (e.evt.button == 2){//right mouse button
+            console.log('Right mouse click, destroy arrow');
+
+            if (srcConNode != null){
                 srcConNode.stroke('black')
                 srcConNode.strokeWidth(2);
-                srcConNode = null;
-                stateMouseOver.stroke('black')
-                stateMouseOver.strokeWidth(2);
-                newArrow.listening (true);
+                newArrow.destroy();
             }
-
         }
-        else if (e.target === stage) {
-        console.log('click on stage')
-          if (srcConNode != null){
-                 console.log("Add point to arrow");
-                mpos = mousePointToStage();
-                let arrowPoints = newArrow.points();
-                arrowPoints[arrowPoints.length -2] = mpos.x;
-                arrowPoints[arrowPoints.length -1] = mpos.y;
-                newArrow.points(arrowPoints.concat([mpos.x,mpos.y]));
-                console.log(arrowPoints);
-                console.log(arrowPoints.concat([mpos.x,mpos.y]));
-          }
-        }
-
-
     }
 });
 
