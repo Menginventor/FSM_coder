@@ -145,7 +145,7 @@ function addState(property){
         circle.state_text.y(circle.y() - circle.state_text.height()/2);
         arrowLayer.children.forEach(function (arrow) {
             if (arrow.srcState == circle){
-                destrosArrowPoints();
+                destroyArrowPoints();
                 let arrowPoints = arrow.points();
                 arrowPoints[0] = circle.x();
                 arrowPoints[1] = circle.y();
@@ -162,7 +162,7 @@ function addState(property){
             }
             // if-if fir recurrent transistion
             if (arrow.dstState == circle){
-                destrosArrowPoints();
+                destroyArrowPoints();
                 let arrowPoints = arrow.points();
                 let lastPointX = arrowPoints[arrowPoints.length -4];
                 let lastPointY = arrowPoints[arrowPoints.length -3];
@@ -275,7 +275,7 @@ function addState(property){
 
         arrowLayer.children.forEach(function (arrow) {
             if (arrow.srcState == circle){
-                destrosArrowPoints();
+                destroyArrowPoints();
                 let arrowPoints = arrow.points();
                 arrowPoints[0] = circle.x();
                 arrowPoints[1] = circle.y();
@@ -283,7 +283,7 @@ function addState(property){
             }
             // if-if fir recurrent transistion
             if (arrow.dstState == circle){
-                destrosArrowPoints();
+                destroyArrowPoints();
                 let arrowPoints = arrow.points();
                 let lastPointX = arrowPoints[arrowPoints.length -4];
                 let lastPointY = arrowPoints[arrowPoints.length -3];
@@ -718,7 +718,7 @@ stage.on('click tap', function (e) {
                     selectedArrow.text.fill('black');
             }
             selectedArrow = null;
-            destrosArrowPoints();
+            destroyArrowPoints();
         }
            if (e.target === stage) {
           tr.nodes([]);
@@ -908,14 +908,14 @@ function createNewArrow(property){
     arrowLayer.add(arrow_text);
     return arrow;
 }
-function destrosArrowPoints(){
+function destroyArrowPoints(){
     for (let idx = 0;idx < arrowPointsNode.length;idx++){
        arrowPointsNode[idx].destroy();
     }
      arrowPointsNode = [];
 }
 function showArrowPoints(arrow){
-    destrosArrowPoints();
+    destroyArrowPoints();
     let arrowPoints = arrow.points();
     for (let idx = 0; idx < arrowPoints.length; idx +=2){
         let px = arrowPoints[idx];
@@ -1244,8 +1244,10 @@ function deleteShape(){
         }
         if (selectedArrow != null){
 
-            destrosArrowPoints();
+            destroyArrowPoints();
+            selectedArrow.text.destroy();
             selectedArrow.destroy();
+            
             selectedArrow = null;
         }
 }
