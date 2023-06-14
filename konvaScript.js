@@ -318,14 +318,10 @@ function addText(property){
         console.log('Create text with pre-define property');
         textX = property.x;
         textY = property.y;
-        scaleX = property.scaleX;
-        scaleY = property.scaleY;
+
         text_letter = property.text;
 
-
     }
-
-
 
     let text = new Konva.Text({
         name : 'text',
@@ -334,14 +330,12 @@ function addText(property){
         fontFamily: 'Calibri',
         fill: '#000',
 
-
-        padding: 5,
+        padding: 0,
         align: 'left',
         verticalAlign: 'middle',
         x: textX,
         y: textY,
-        scaleX : scaleX,
-        scaleY : scaleY,
+
         draggable: true,
     })
 
@@ -353,7 +347,7 @@ function addText(property){
 
 
 
-   text.on('dblclick dbltap', () => {
+   text.on('dblclick dbltap', () => { // Double click for edit text on stage
     tr.nodes([]);// Clear selection
 
 
@@ -364,36 +358,39 @@ function addText(property){
 
         // so position of textarea will be the sum of positions above:
         let areaPosition = {
-          x: stageBox.left + textPosition.x,
-          y: stageBox.top + textPosition.y,
+              x: stageBox.left + textPosition.x,
+              y: stageBox.top + textPosition.y,
         };
 
         // create textarea and style it
         let textarea = document.createElement('div');
         document.body.appendChild(textarea);
 
-       htmlText = text.text().replaceAll('\n','<br>')
+        htmlText = text.text().replaceAll('\n','<br>')
         textarea.innerHTML = '<div>' + htmlText + '</div>' ;
         textarea.style.position = 'absolute';
         textarea.style.top = areaPosition.y+1.6 + 'px';
         textarea.style.left = areaPosition.x+3 + 'px';
 
-         textarea.style.border = 'none';
+        textarea.style.border = 'none';
         textarea.style.padding = '0px';
         textarea.style.margin = '0px';
         textarea.style.overflow = 'hidden';
         textarea.style.background = 'none';
-
+        textarea.style.minWidth= "10px"; // without this line, the element's width will be zero when there are no charactor then cursor will disappear.
         textarea.style.lineHeight = text.lineHeight();
         textarea.style.fontFamily = text.fontFamily();
          textarea.style.fontSize = text.fontSize()*stage.scaleX() + 'px';
 
          textarea.contentEditable = 'true';
-         textarea.style.display = 'flex'
+         textarea.style.display = 'block'
+
 
 
 
         textarea.focus();
+        document.execCommand('selectAll',false,null);
+        console.log(textarea)
         textarea.addEventListener('keypress', function (e) {
         console.log(e);
                 if (e.keyCode === 13 || e.which === 13) {
