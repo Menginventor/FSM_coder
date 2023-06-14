@@ -592,7 +592,7 @@ stage.on('mouseup touchend', (e) => {
       selectionRectangle.visible(false);
     });
 
-    let shapes = stage.find('.state');
+    let shapes = stage.find('.state,.text');
     let box = selectionRectangle.getClientRect();
     let selected = shapes.filter((shape) =>
       Konva.Util.haveIntersection(box, shape.getClientRect())
@@ -1239,24 +1239,32 @@ container.addEventListener('keydown', function (event) {
 function deleteShape(){
         if (tr.node != null){
             let eleList = tr.nodes()
-            for (let idx = 0;idx < eleList.length; idx++){
-                if (eleList[idx].state_text.text() != 'init'){
-
-                    //
-                    arrowLayer.children.forEach(function (arrow) {
+            for (let idx = 0;idx < eleList.length; idx++){// looop through selected element
+                //check if element is state
+                if (eleList[idx].parent == stateLayer){
+                    console.log("element is state");
+                    if (eleList[idx].state_text.text() != 'init'){
+                        //
+                        arrowLayer.children.forEach(function (arrow) {
                         if (arrow.srcState == eleList[idx]){
-                           arrow.srcState = null;
+                        arrow.srcState = null;
                         }
                         // if-if fir recurrent transistion
                         if (arrow.dstState == eleList[idx]){
-                            arrow.dstState = null;
+                        arrow.dstState = null;
                         }
-                    });
-                    eleList[idx].state_text.destroy();
+                        });
+                        eleList[idx].state_text.destroy();
+                        eleList[idx].destroy();
+                    }
+                }
+                else{
                     eleList[idx].destroy();
                 }
 
+
             }
+
             tr.nodes([]);
         }
         if (selectedArrow != null){
