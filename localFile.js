@@ -312,8 +312,10 @@ async function saveAsFunc(){
 
         let data = {};
         data.state = {};
+        data.text = {};
         data.arrow = {};
         data.globalCode = globalCode;
+        console.log('saving state layer');
         for (let idx = 0; idx < stateLayer.children.length; idx++){
             let child = stateLayer.children[idx]
             if (child.name() == 'state'){
@@ -333,22 +335,27 @@ async function saveAsFunc(){
             }
 
         }
+        console.log('saving arrow layer');
         for (let idx = 0; idx < arrowLayer.children.length; idx++){
             let child = arrowLayer.children[idx]
-            console.log(child);
-            console.log(child.srcState);
-            console.log(child.srcState.state_text);
-            console.log(child.srcState.state_text.text());
-            let srcStateIdx = child.srcState.index;
-            let dstStateIdx = child.dstState.index;
-            let points = child.points();
-            data.arrow[idx] = {};
-            data.arrow[idx].srcStateIdx = srcStateIdx;
-            data.arrow[idx].dstStateIdx = dstStateIdx;
-            data.arrow[idx].points = points;
-            data.arrow[idx].code = child.code;
-            data.arrow[idx].textX = child.text.x();
-            data.arrow[idx].textY = child.text.y();
+            if (child.name() == 'arrow'){
+                console.log(child);
+                console.log(child.srcState);
+                console.log(child.srcState.state_text);
+                console.log(child.srcState.state_text.text());
+                let srcStateIdx = child.srcState.index;
+                let dstStateIdx = child.dstState.index;
+                let points = child.points();
+                data.arrow[idx] = {};
+                data.arrow[idx].srcStateIdx = srcStateIdx;
+                data.arrow[idx].dstStateIdx = dstStateIdx;
+                data.arrow[idx].points = points;
+                data.arrow[idx].code = child.code;
+                data.arrow[idx].textX = child.text.x();
+                data.arrow[idx].textY = child.text.y();
+
+
+            }
         }
         console.log(data)
         let writeContent = JSON.stringify(data, null, 4);
