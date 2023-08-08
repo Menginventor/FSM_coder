@@ -66,7 +66,7 @@ async function generateIno(){
 
     tr.nodes([]);
     selectedArrow = null;
-    destrosArrowPoints();
+    destroyArrowPoints();
     codeHeaderEle.innerText = 'Output Code';
     editor.session.setValue(outputCode,-1);
 }
