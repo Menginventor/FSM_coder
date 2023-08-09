@@ -15,6 +15,7 @@ editor.session.on('change', function(delta) {
         console.log('update global code')
         globalCode = editor.getValue();
     }
+    editor.resize();// fixing scroll down issue
 });
 
 const generateInoBtn = document.getElementById('generateIno');
