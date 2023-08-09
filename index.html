@@ -136,7 +136,19 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     }
 
 
+
 </script>
+<script>
+    window.onbeforeunload = closing;
+/* other code here */
+
+var closing = function (e) {
+        console.log("function alrt WORKS !!!!");
+        window.alert("closing now.....");
+        e.returnValue = 'onbeforeunload';
+       }
+</script>
+
 <script src="konvaScript.js"></script>
 <script type="module">
   import { get, set } from 'https://cdn.jsdelivr.net/npm/idb-keyval@6/+esm';
